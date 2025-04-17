@@ -1,0 +1,1206 @@
+2025-03-08 03:53:31.194 PM [Hospital-Management-System] error: uncaughtException: Route.delete() requires a callback function but got a [object Undefined]
+Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:13:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23) Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:13:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23)
+2025-03-08 03:55:39.507 PM [Hospital-Management-System] error: uncaughtException: Route.delete() requires a callback function but got a [object Undefined]
+Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:12:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23) Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:12:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23)
+2025-03-08 03:55:53.315 PM [Hospital-Management-System] error: uncaughtException: Route.delete() requires a callback function but got a [object Undefined]
+Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:12:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23) Error: Route.delete() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as delete] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:12:14)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23)
+2025-03-08 03:58:25.343 PM [Hospital-Management-System] error: uncaughtException: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:4:26)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:4:26)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-08 03:58:31.584 PM [Hospital-Management-System] error: uncaughtException: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:4:26)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../middlewares/permissionMiddleware'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/routes/auditRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:4:26)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-08 04:24:22.207 PM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23)
+2025-03-08 04:24:32.011 PM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:8:23)
+2025-03-08 04:28:29.284 PM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/staffRoutes.js:14:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:9:21) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/staffRoutes.js:14:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:9:21)
+2025-03-08 04:28:42.892 PM [Hospital-Management-System] error: uncaughtException: Route.get() requires a callback function but got a [object Undefined]
+Error: Route.get() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:10:21) Error: Route.get() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/auditRoutes.js:9:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:10:21)
+2025-03-08 04:28:54.625 PM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/medicalRecordRoutes.js:14:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:11:29) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/medicalRecordRoutes.js:14:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:11:29)
+2025-03-08 04:29:11.370 PM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/roleRoutes.js:13:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:12:20) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/roleRoutes.js:13:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:12:20)
+2025-03-11 09:28:23.517 AM [Hospital-Management-System] error: uncaughtException: Identifier 'Appointment' has already been declared
+/workspaces/Hospital-Management-System/backend/controllers/appointmentController.js:8
+const Appointment = require("../models/Appointment");
+      ^
+
+SyntaxError: Identifier 'Appointment' has already been declared
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/appointmentRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) /workspaces/Hospital-Management-System/backend/controllers/appointmentController.js:8
+const Appointment = require("../models/Appointment");
+      ^
+
+SyntaxError: Identifier 'Appointment' has already been declared
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/appointmentRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-11 09:30:51.883 AM [Hospital-Management-System] error: uncaughtException: Cannot find module '../models/Doctor'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/appointmentController.js
+- /workspaces/Hospital-Management-System/backend/routes/appointmentRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../models/Doctor'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/appointmentController.js
+- /workspaces/Hospital-Management-System/backend/routes/appointmentRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/appointmentController.js:3:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../models/Doctor'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/appointmentController.js
+- /workspaces/Hospital-Management-System/backend/routes/appointmentRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/appointmentController.js:3:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-11 09:38:46.909 AM [Hospital-Management-System] error: uncaughtException: Cannot find module 'openai'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/medicalRecordService.js
+- /workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js
+- /workspaces/Hospital-Management-System/backend/routes/medicalRecordRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module 'openai'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/medicalRecordService.js
+- /workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js
+- /workspaces/Hospital-Management-System/backend/routes/medicalRecordRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:2:20)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module 'openai'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/medicalRecordService.js
+- /workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js
+- /workspaces/Hospital-Management-System/backend/routes/medicalRecordRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:2:20)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-11 09:39:14.998 AM [Hospital-Management-System] error: uncaughtException: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14) Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+2025-03-11 09:39:54.146 AM [Hospital-Management-System] error: uncaughtException: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14) Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+2025-03-11 09:41:29.565 AM [Hospital-Management-System] error: uncaughtException: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14) Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+2025-03-11 09:41:36.023 AM [Hospital-Management-System] error: uncaughtException: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14) Error: The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).
+    at new OpenAI (/workspaces/Hospital-Management-System/backend/node_modules/openai/index.js:69:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/medicalRecordService.js:4:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/medicalRecordController.js:2:36)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+2025-03-11 09:42:11.245 AM [Hospital-Management-System] error: uncaughtException: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/labTestController.js
+- /workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/labTestController.js
+- /workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/labTestController.js:4:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/labTestController.js
+- /workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/labTestController.js:4:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-11 09:44:29.812 AM [Hospital-Management-System] error: uncaughtException: Route.post() requires a callback function but got a [object Undefined]
+Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js:15:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:14:23) Error: Route.post() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as post] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js:15:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:14:23)
+2025-03-11 09:46:00.875 AM [Hospital-Management-System] error: uncaughtException: updateLabTestStatus is not defined
+ReferenceError: updateLabTestStatus is not defined
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js:24:81)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:14:23)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: updateLabTestStatus is not defined
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/labTestRoutes.js:24:81)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:14:23)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-11 09:49:40.030 AM [Hospital-Management-System] error: uncaughtException: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/shiftController.js
+- /workspaces/Hospital-Management-System/backend/routes/shiftRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/shiftController.js
+- /workspaces/Hospital-Management-System/backend/routes/shiftRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/shiftController.js:3:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/shiftController.js
+- /workspaces/Hospital-Management-System/backend/routes/shiftRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/shiftController.js:3:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-11 09:50:17.594 AM [Hospital-Management-System] error: uncaughtException: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/shiftService.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/shiftService.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/shiftService.js:4:29)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/services/shiftService.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/services/shiftService.js:4:29)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-12 07:17:25.020 AM [Hospital-Management-System] error: uncaughtException: Cannot find module 'bcrypt'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/staffController.js
+- /workspaces/Hospital-Management-System/backend/routes/staffRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+Error: Cannot find module 'bcrypt'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/staffController.js
+- /workspaces/Hospital-Management-System/backend/routes/staffRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/staffController.js:2:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module 'bcrypt'
+Require stack:
+- /workspaces/Hospital-Management-System/backend/controllers/staffController.js
+- /workspaces/Hospital-Management-System/backend/routes/staffRoutes.js
+- /workspaces/Hospital-Management-System/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/controllers/staffController.js:2:16)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-12 07:48:01.882 AM [Hospital-Management-System] error: uncaughtException: Identifier 'Patient' has already been declared
+/workspaces/Hospital-Management-System/backend/controllers/patientController.js:8
+const Patient = require("../models/Patient");
+      ^
+
+SyntaxError: Identifier 'Patient' has already been declared
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:2:73)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) /workspaces/Hospital-Management-System/backend/controllers/patientController.js:8
+const Patient = require("../models/Patient");
+      ^
+
+SyntaxError: Identifier 'Patient' has already been declared
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/patientRoutes.js:2:73)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-12 09:32:32.318 AM [Hospital-Management-System] error: uncaughtException: Route.get() requires a callback function but got a [object Undefined]
+Error: Route.get() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/roleRoutes.js:17:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:17:20) Error: Route.get() requires a callback function but got a [object Undefined]
+    at Route.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/route.js:216:15)
+    at proto.<computed> [as get] (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/router/index.js:521:19)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/routes/roleRoutes.js:17:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/Hospital-Management-System/backend/server.js:17:20)
+2025-03-17 09:10:26.806 PM [Hospital-Management-System] error: uncaughtException: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49 Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+2025-03-17 09:10:41.045 PM [Hospital-Management-System] error: uncaughtException: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49 Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+2025-03-17 09:11:07.863 PM [Hospital-Management-System] error: uncaughtException: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49 Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:123:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+2025-03-18 01:07:19.905 PM [Hospital-Management-System] error: uncaughtException: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/hos/backend/controllers/taskController.js
+- /workspaces/hos/backend/routes/taskRoutes.js
+- /workspaces/hos/backend/server.js
+Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/hos/backend/controllers/taskController.js
+- /workspaces/hos/backend/routes/taskRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/taskController.js:3:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../utils/notificationService'
+Require stack:
+- /workspaces/hos/backend/controllers/taskController.js
+- /workspaces/hos/backend/routes/taskRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/taskController.js:3:30)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-19 10:19:39.022 AM [Hospital-Management-System] error: uncaughtException: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:127:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49 Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:127:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+2025-03-19 10:26:33.269 AM [Hospital-Management-System] error: uncaughtException: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:127:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49 Error: listen EADDRINUSE: address already in use :::5000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Object.<anonymous> (/workspaces/hos/backend/server.js:127:8)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:173:12)
+    at node:internal/main/run_main_module:28:49
+2025-03-21 10:36:32.321 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:37:12.364 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:37:26.550 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:38:00.981 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:39:07.524 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:40:13.970 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:40:28.536 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:40:48.076 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 10:41:07.710 AM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:12:3)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 12:36:01.663 PM [Hospital-Management-System] error: uncaughtException: a is not defined
+ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:13:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: a is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/models/Staff.js:13:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 12:36:34.856 PM [Hospital-Management-System] error: uncaughtException: cc is not defined
+ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 12:36:48.919 PM [Hospital-Management-System] error: uncaughtException: missing ) after argument list
+/workspaces/hos/backend/models/Staff.js:10
+  },a
+    ^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) /workspaces/hos/backend/models/Staff.js:10
+  },a
+    ^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1378:20)
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/authController.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 12:36:59.658 PM [Hospital-Management-System] error: uncaughtException: cc is not defined
+ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 12:37:28.258 PM [Hospital-Management-System] error: uncaughtException: cc is not defined
+ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10) ReferenceError: cc is not defined
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/staffController.js:10:1)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/routes/staffRoutes.js:7:5)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+2025-03-21 01:09:50.295 PM [Hospital-Management-System] error: uncaughtException: Cannot find module '../models/StaffRole'
+Require stack:
+- /workspaces/hos/backend/middlewares/checkPermission.js
+- /workspaces/hos/backend/routes/appointmentRoutes.js
+- /workspaces/hos/backend/server.js
+Error: Cannot find module '../models/StaffRole'
+Require stack:
+- /workspaces/hos/backend/middlewares/checkPermission.js
+- /workspaces/hos/backend/routes/appointmentRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/middlewares/checkPermission.js:1:19)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../models/StaffRole'
+Require stack:
+- /workspaces/hos/backend/middlewares/checkPermission.js
+- /workspaces/hos/backend/routes/appointmentRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/middlewares/checkPermission.js:1:19)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+2025-03-21 01:11:32.568 PM [Hospital-Management-System] error: uncaughtException: Cannot find module '../models/PatientRole'
+Require stack:
+- /workspaces/hos/backend/controllers/patientController.js
+- /workspaces/hos/backend/routes/patientRoutes.js
+- /workspaces/hos/backend/server.js
+Error: Cannot find module '../models/PatientRole'
+Require stack:
+- /workspaces/hos/backend/controllers/patientController.js
+- /workspaces/hos/backend/routes/patientRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/patientController.js:3:21)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19) Error: Cannot find module '../models/PatientRole'
+Require stack:
+- /workspaces/hos/backend/controllers/patientController.js
+- /workspaces/hos/backend/routes/patientRoutes.js
+- /workspaces/hos/backend/server.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+    at Module._load (node:internal/modules/cjs/loader:1051:27)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (/workspaces/hos/backend/controllers/patientController.js:3:21)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)

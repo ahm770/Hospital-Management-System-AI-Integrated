@@ -1,0 +1,3691 @@
+
+===== File: /utils/logger.js =====
+const winston = require('winston');
+const { format } = winston;
+const { combine, timestamp, label, printf, colorize, json } = format;
+require('winston-daily-rotate-file'); // For daily log rotation
+
+// Define log levels
+const logLevels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6
+};
+
+// Define custom log format
+const logFormat = printf(({ level, message, label, timestamp, stack }) => {
+    return `${timestamp} [${label}] ${level}: ${message} ${stack || ''}`;
+});
+
+const isDev = process.env.NODE_ENV === 'development';
+
+let transports = [
+    new winston.transports.Console({
+        level: 'silly',   //remove this line for default info level
+        format: combine(
+            colorize({ all: true }),
+            label({ label: 'Hospital-Management-System' }),
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            logFormat
+        )
+    })
+];
+
+// Add file transport in production
+if (!isDev) {
+    transports.push(
+        new winston.transports.DailyRotateFile({
+            filename: 'logs/application-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d',
+            format: combine(
+                label({ label: 'Hospital-Management-System' }),
+                timestamp(),
+                json()
+            )
+        })
+    );
+}
+
+// Create Winston logger
+const logger = winston.createLogger({
+    levels: logLevels,
+    format: combine(
+        label({ label: 'Hospital-Management-System' }),
+        timestamp({
+            format: 'YYYY-MM-DD hh:mm:ss.SSS A',
+        }),
+        logFormat
+    ),
+    transports: transports,
+    exceptionHandlers: [
+        new winston.transports.Console(), // Console for exceptions
+        new winston.transports.File({ filename: 'logs/exceptions.log' }) //File for exceptions
+    ],
+    rejectionHandlers: [
+        new winston.transports.Console(), // Console for rejections
+        new winston.transports.File({ filename: 'logs/rejections.log' }) //File for rejections
+    ],
+});
+
+module.exports = logger;
+
+===== File: /middlewares/auditMiddleware.js =====
+const AuditLog = require("../models/AuditLog");
+
+const createAuditLog = (schema, entityName) => {
+    schema.pre("save", async function (next) {
+        if (this.isNew) {
+            await AuditLog.create({
+                action: "create",
+                entity: entityName,
+                entityId: this._id,
+                performedBy: this.createdBy || null,
+                performedByModel: "Staff", // Adjust if patients can create records
+                after: this.toObject(),
+                timestamp: new Date(),
+            });
+        } else {
+            const original = await this.constructor.findById(this._id).lean();
+            await AuditLog.create({
+                action: "update",
+                entity: entityName,
+                entityId: this._id,
+                performedBy: this.updatedBy || null,
+                performedByModel: "Staff",
+                before: original,
+                after: this.toObject(),
+                timestamp: new Date(),
+            });
+        }
+        next();
+    });
+
+    schema.pre("deleteOne", { document: true, query: false }, async function (next) {
+        await AuditLog.create({
+            action: "delete",
+            entity: entityName,
+            entityId: this._id,
+            performedBy: this.deletedBy || null,
+            performedByModel: "Staff",
+            before: this.toObject(),
+            timestamp: new Date(),
+        });
+        next();
+    });
+};
+
+module.exports = createAuditLog;
+
+
+===== File: /middlewares/authMiddleware.js =====
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const BlacklistedToken = require("../models/BlacklistedToken");
+
+const authenticateUser = async (req, res, next) => {
+  try {
+    // Check if token is provided
+    const token = req.header("Authorization")?.split(" ")[1]; // Extract token from Bearer header
+    if (!token) {
+      return res.status(401).json({ message: "Access denied. No token provided." });
+    }
+       // Check if token is blacklisted
+       const isBlacklisted = await BlacklistedToken.findOne({ token });
+       if (isBlacklisted) {
+           return res.status(403).json({ message: "Token is invalid. Please log in again." });
+       }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-password").populate("role"); // Attach user data to request
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Invalid token. User not found." });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Auth Error:", error);
+    res.status(401).json({ message: "Invalid token. Please authenticate." });
+  }
+};
+
+module.exports = authenticateUser;
+
+
+===== File: /middlewares/checkPermission.js =====
+const Role = require("../models/Role");
+const checkPermission = (requiredPermission) => async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized. Please log in." });
+    }
+
+    // ✅ Super Admins bypass all permission checks
+    if (req.user.role.name === "Super Admin") {
+      return next();
+    }
+
+    // 🔎 Normal Staff/Admin permission check
+    const role = await Role.findById(req.user.role._id).populate("permissions");
+    if (!role) {
+      return res.status(403).json({ message: "Role not found. Access denied." });
+    }
+
+    const userPermissions = role.permissions.map((perm) => perm.action);
+    if (!userPermissions.includes(requiredPermission)) {
+      return res.status(403).json({ message: "Insufficient permissions." });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Permission Check Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+module.exports = checkPermission;
+
+
+===== File: /middlewares/errorHandler.js =====
+const errorHandler = (err, req, res, next) => {
+    console.error(`❌ Error: ${err.message}`);
+
+    // Determine response status
+    let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    let message = err.message || 'Internal Server Error';
+
+    // Handle specific error types
+    if (err.name === 'ValidationError') {
+        statusCode = 400;
+        message = 'Validation Error: ' + Object.values(err.errors).map(e => e.message).join(', ');
+    } else if (err.name === 'JsonWebTokenError') {
+        statusCode = 401;
+        message = 'Invalid token';
+    } else if (err.name === 'TokenExpiredError') {
+        statusCode = 401;
+        message = 'Token expired';
+    } else if (err.name === 'CastError') {
+        statusCode = 400;
+        message = `Invalid ID format: ${err.value}`;
+    }
+
+    res.status(statusCode).json({ error: message });
+};
+
+module.exports = errorHandler;
+
+
+===== File: /middlewares/socketMiddleware.js =====
+// src/middleware/socketMiddleware.ts
+const jwt = require('jsonwebtoken');
+
+module.exports = (socket, next) => {
+    console.log("in socket service::")
+    const token = socket.handshake.auth.token; // Get token from handshake
+    console.log(" socket service token::", token)
+    if (!token) {
+        return next(new Error("Authentication error: No token provided"));
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return next(new Error("Authentication error: Invalid token"));
+        }
+        socket.user = decoded; // Attach user info to socket
+        next();
+    });
+};
+
+===== File: /controllers/appointmentController.js =====
+const Staff = require("../models/Staff");
+const Role = require("../models/Role");
+const Appointment = require("../models/Appointment");
+const Patient = require("../models/Patient");
+const Task = require("../models/Task");
+const { notificationEmitter } = require("../services/notificationService");
+ 
+/**
+ * AI-powered function to find the best available time slot.
+ */
+const findBestTimeSlot = async (doctorId, date, patientId) => {
+  const doctor = await Staff.findById(doctorId).populate("role");
+  if (!doctor || doctor.role.name !== "Doctor") return null;
+
+  const { workingHours } = doctor; // Example: { start: "09:00", end: "17:00" }
+  let availableSlots = [];
+
+  let startTime = parseInt(workingHours.start.split(":")[0]);
+  let endTime = parseInt(workingHours.end.split(":")[0]);
+
+  for (let hour = startTime; hour < endTime; hour++) {
+    availableSlots.push(`${hour}:00`);
+    availableSlots.push(`${hour}:30`);
+  }
+
+  const bookedAppointments = await Appointment.find({ doctor: doctorId, date });
+  const bookedTimes = bookedAppointments.map((appt) => appt.time);
+  availableSlots = availableSlots.filter((slot) => !bookedTimes.includes(slot));
+
+  const pastAppointments = await Appointment.find({ patient: patientId }).sort({ date: -1 }).limit(5);
+  const preferredTimes = pastAppointments.map((appt) => appt.time);
+
+  return availableSlots.find((slot) => preferredTimes.includes(slot)) || availableSlots[0] || null;
+};
+
+/**
+ * Create an appointment
+ */
+const { sendNotification } = require("../services/notificationService");
+
+const createAppointment = async (req, res) => {
+  try {
+    let { patient, doctor, department, date, time } = req.body;
+
+    if (!patient || !department || !date) {
+      return res.status(400).json({ message: "Patient, department, and date are required." });
+    }
+
+    // ✅ Check if the patient exists
+    const patientExists = await Patient.findById(patient);
+    if (!patientExists) {
+      return res.status(404).json({ message: "Patient not found." });
+    }
+
+    // ✅ Fetch Doctor Role
+    const doctorRole = await Role.findOne({ name: "Doctor" });
+    if (!doctorRole) {
+      return res.status(500).json({ message: "Doctor role not found." });
+    }
+
+    let doctorData = null;
+
+    if (doctor) {
+      // ✅ Validate if the provided doctor belongs to the department
+      doctorData = await Staff.findOne({ _id: doctor, department, role: doctorRole._id });
+      if (!doctorData) {
+        return res.status(404).json({ message: "Doctor not found in this department." });
+      }
+    } else {
+      // ✅ Auto-assign doctor (least busy one)
+      doctorData = await Staff.findOne({ department, role: doctorRole._id })
+        .sort({ appointmentsCount: 1 })
+        .select("_id firstName lastName workingHours");
+
+      if (!doctorData) {
+        return res.status(404).json({ message: "No available doctors in this department." });
+      }
+
+      doctor = doctorData._id;
+      console.log("Auto-assigned doctor:", doctorData);
+    }
+    
+    patientExists.assignedDoctor = doctor;
+    console.log("assigned doc!!!!")
+    await patientExists.save();
+      
+
+    // ✅ Auto-assign best available time if not provided
+    if (!time) {
+      time = await findBestTimeSlot(doctor, date, patient);
+      if (!time) {
+        return res.status(400).json({ message: "No available time slots for this doctor on the selected date." });
+      }
+    }
+
+    // ✅ Fetch Receptionist Role
+    const receptionistRole = await Role.findOne({ name: "Receptionist" });
+    const receptionist = await Staff.findOne({ department, role: receptionistRole._id });
+
+    // ✅ Create Appointment
+    const newAppointment = new Appointment({
+      patient,
+      doctor,
+      department,
+      date,
+      time,
+      status: "pending",
+      assignedTo: receptionist ? receptionist._id : null,
+      createdBy: req.user.id,
+    });
+
+    await newAppointment.save();
+
+   
+    // ✅ Create a Task for the Receptionist
+    if (receptionist) {
+      const task = new Task({
+        title: "Confirm Appointment",
+        description: `Confirm appointment for ${patientExists.firstName} ${patientExists.lastName} with Dr. ${doctorData.firstName} on ${date} at ${time}.`,
+        assignedTo: receptionist._id,
+        createdBy: req.user.id,
+        type: "appointment",
+        priority: "medium",
+      });
+
+      await task.save();
+
+      // 🔥 Send notification to receptionist using the service
+      await sendNotification(
+        receptionist._id,
+        `📌 New task: Confirm appointment for ${patientExists.firstName}.`,
+        "appointment"
+      );
+    }
+
+    // 🔥 Send notification to patient
+    await sendNotification(
+      patient,
+      `📅 Your appointment with Dr. ${doctorData.firstName} is scheduled on ${date} at ${time}.`,
+      "appointment"
+    );
+
+    // 🔥 Send notification to doctor
+    await sendNotification(
+      doctor,
+      `👨‍⚕️ New appointment scheduled with patient ${patientExists.firstName} on ${date} at ${time}.`,
+      "appointment"
+    );
+
+    res.status(201).json({
+      message: "Appointment created successfully, and task assigned.",
+      appointment: newAppointment,
+    });
+
+  } catch (error) {
+    console.error("Create Appointment Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+/**
+ * Get all appointments based on user role
+ */
+const getAllAppointments = async (req, res) => {
+  try {
+    let { page, limit, search } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    let filter = {};
+    ;
+
+    // Role-based filtering
+    if (req.user.role.name === "Doctor") {
+      filter.doctor = req.user.id;
+    } else if (req.user.role.name === "Patient") {
+      filter.assignedTo = req.user.id;
+    } else if (req.user.role.name === "Patient") {
+      filter.patient = req.user.id;
+    }
+
+    // Apply search filtering (date, patient name, doctor name)
+    if (search) {
+      filter.$or = [
+         
+        { "patient.firstName": { $regex: search, $options: "i" } }, // Patient name
+        { "patient.lastName": { $regex: search, $options: "i" } },
+        { "doctor.firstName": { $regex: search, $options: "i" } }, // Doctor name
+        { "doctor.lastName": { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Fetch appointments with pagination
+    const appointments = await Appointment.find(filter)
+      .populate("patient", "firstName lastName")
+      .populate("doctor", "firstName lastName")
+      .populate("department", "name")
+      .skip(skip)
+      .limit(limit);
+
+    // Count total records for pagination metadata
+    const totalAppointments = await Appointment.countDocuments(filter);
+
+    res.status(200).json({
+      appointments,
+      currentPage: page,
+      totalPages: Math.ceil(totalAppointments / limit),
+      totalAppointments,
+    });
+  } catch (error) {
+    console.error("Get Appointments Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
+/**
+ * Update an appointment
+ */
+const updateAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const appointment = await Appointment.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Emit real-time update event
+    if (global.io) {
+      global.io.emit("appointmentUpdated", appointment);
+    }
+
+    res.status(200).json({ message: "Appointment updated successfully", appointment });
+  } catch (error) {
+    console.error("Update Appointment Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Delete an appointment
+ */
+const deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await Appointment.findByIdAndDelete(id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Emit real-time delete event
+    if (global.io) {
+      global.io.emit("appointmentDeleted", { appointmentId: id });
+    }
+
+    res.status(200).json({ message: "Appointment deleted successfully" });
+  } catch (error) {
+    console.error("Delete Appointment Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { createAppointment, getAllAppointments, updateAppointment, deleteAppointment };
+
+
+===== File: /controllers/auditController.js =====
+const AuditLog = require("../models/AuditLog");
+
+// @desc    Get audit logs with filters
+// @route   GET /api/audit-logs
+// @access  Restricted (Super Admins or roles with "view_audit_logs")
+const getAuditLogs = async (req, res) => {
+  try {
+    let { user, entity, startDate, endDate, search, page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    const filters = {};
+
+    if (user) filters.performedBy = user;
+    if (entity) filters.entity = entity;
+    if (startDate || endDate) {
+      filters.timestamp = {};
+      if (startDate) filters.timestamp.$gte = new Date(startDate);
+      if (endDate) filters.timestamp.$lte = new Date(endDate);
+    }
+
+    // Search functionality (search within "action" and "description")
+    if (search) {
+      filters.$or = [
+        { action: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Fetch audit logs with pagination and sorting
+    const auditLogs = await AuditLog.find(filters)
+      .sort({ timestamp: -1 }) // Sort by newest first
+      .skip(skip)
+      .limit(limit);
+
+    // Count total matching audit logs for pagination
+    const totalLogs = await AuditLog.countDocuments(filters);
+
+    res.status(200).json({
+      success: true,
+      logs: auditLogs,
+      currentPage: page,
+      totalPages: Math.ceil(totalLogs / limit),
+      totalLogs,
+    });
+  } catch (error) {
+    console.error("Error fetching audit logs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+module.exports = { getAuditLogs };
+
+
+===== File: /controllers/authController.js =====
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const Patient = require("../models/Patient");
+const Staff = require("../models/Staff");
+const Role = require("../models/Role");
+const Permission = require("../models/Permission");  
+const BlacklistedToken = require("../models/BlacklistedToken");
+
+const Department = require("../models/Department")
+const logger = require("../utils/logger");
+ 
+const register = async (req, res) => {
+    try {
+        logger.silly(`body::: ${JSON.stringify(req.body)}`);
+
+        const { firstName, lastName, email, password, phone, address, gender, userType, role, department, dob } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email is already in use." });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        let newUser;
+
+        if (userType === "Patient") {
+             // Validate patient role
+             const p_role = await Role.findOne({ name:"Patient"}).populate("permissions");
+             if (!role) {
+                 return res.status(400).json({ message: "Invalid patient role." });
+             }
+            newUser = new Patient({
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword,
+                phone,
+                address,
+                gender,
+                dob,
+                role: p_role._id,
+            });
+
+        } else if (userType === "Staff") {
+            if (!role || !department) {
+                return res.status(400).json({ message: "Staff role and department are required for staff registration." });
+            }
+
+            // Validate staff role
+            const role = await Role.findOne({ name: role }).populate("permissions");
+            if (!role) {
+                return res.status(400).json({ message: "Invalid staff role." });
+            }
+
+            // Validate department
+            const departmentDoc = await Department.findOne({ name: department });
+            if (!departmentDoc) {
+                logger.error("Invalid department.");
+                return res.status(400).json({ message: "Invalid department." });
+            }
+
+            newUser = new Staff({
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword,
+                phone,
+                address,
+                gender,
+                dob,
+                role: role._id,
+                department: departmentDoc._id
+            });
+        } else {
+            return res.status(400).json({ message: "Invalid user type. Must be 'Patient' or 'Staff'." });
+        }
+
+        await newUser.save();
+
+        // Populate role and department for staff & remove sensitive fields
+        if (userType === "Staff") {
+            newUser = await Staff.findById(newUser._id)
+                .populate("role", "name")
+                .populate("department", "name")
+                .select("-password -__v")
+                .lean();
+        } else {
+            newUser = await Patient.findById(newUser._id)
+                .select("-password -__v -medicalRecords") // Exclude medicalRecords
+                .lean();
+        }
+
+        res.status(201).json({ message: "User registered successfully.", user: newUser });
+
+    } catch (error) {
+        logger.error("Registration Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+  
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Find user and populate roles based on userType
+        const user = await User.findOne({ email })
+            .populate({
+                path: "role",
+                select: "name",
+                options: { strictPopulate: false }, // Avoid errors for Patients
+            })
+            .populate({
+                path: "department",
+                select: "name",
+                options: { strictPopulate: false }, // Avoid errors for Patients
+            })
+           
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid email or password." });
+        }
+
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid email or password." });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: user._id, userType: user.userType },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        // Remove sensitive data
+        const sanitizedUser = user.toObject();
+        delete sanitizedUser.password;
+        delete sanitizedUser.__v;
+
+        // If the user is a patient, remove staff-specific fields
+        if (sanitizedUser.userType === "Patient") {
+            delete sanitizedUser.role;
+            delete sanitizedUser.department;
+        }
+
+        res.json({ message: "Login successful.", token, user: sanitizedUser });
+    } catch (error) {
+        console.error("Login Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+
+const getProfile = async (req, res) => {
+    try {
+      let user = req.user;
+  
+      if (user.userType === "Staff") {
+        user = await user.populate({
+          path: "role department",
+          select: "name", // Only fetch the role/department name
+        });
+      }
+  
+      // Filter out sensitive fields
+      const { password, resetToken, __v, createdAt, updatedAt, ...safeUserData } = user.toObject();
+  
+      res.status(200).json(safeUserData);
+    } catch (error) {
+      console.error("Profile Error:", error);
+      res.status(500).json({ message: "Internal Server Error." });
+    }
+  };
+  
+const logout = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1]; // Extract token from header
+
+        if (!token) {
+            return res.status(400).json({ message: "No token provided." });
+        }
+
+        // Decode token to get expiration time
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const expiresAt = new Date(decoded.exp * 1000); // Convert to Date object
+
+        // Store token in blacklist
+        await new BlacklistedToken({ token, expiresAt }).save();
+
+        res.status(200).json({ message: "Logout successful." });
+    } catch (error) {
+        logger.error("Logout Error:", error);
+        res.status(500).json({ message: "Internal Server Error." });
+    }
+}; 
+
+const resetPassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        // Find the user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Verify the old password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Old password is incorrect." });
+        }
+
+        // Prevent reuse of the same password
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            return res.status(400).json({ message: "New password cannot be the same as the old password." });
+        }
+
+        // Hash and update the new password
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.forcePasswordReset = false; // Allow login after reset
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successful." });
+    } catch (error) {
+        logger.error("Reset Password Error:", error);
+        res.status(500).json({ message: "Internal Server Error." });
+    }
+};
+
+
+module.exports = { register, login, getProfile, logout, resetPassword };
+
+
+===== File: /controllers/departmentController.js =====
+const Department = require("../models/Department");
+
+// Create a new department (Super Admin only)
+const createDepartment = async (req, res) => {
+    try {
+        const { name, description } = req.body;
+        const department = new Department({ name, description });
+        await department.save();
+        res.status(201).json({ message: "Department created successfully", department });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to create department" });
+    }
+};
+
+// Get all departments (Admins & Super Admins)
+const getAllDepartments = async (req, res) => {
+    try {
+        let { page, limit, search } = req.query;
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10000;
+        const skip = (page - 1) * limit;
+
+        let filter = {};
+        if (search) {
+            filter.name = { $regex: search, $options: "i" }; // Case-insensitive search by department name
+        }
+
+        const departments = await Department.find(filter).skip(skip).limit(limit);
+        const totalDepartments = await Department.countDocuments(filter);
+
+        res.status(200).json({
+            departments,
+            currentPage: page,
+            totalPages: Math.ceil(totalDepartments / limit),
+            totalDepartments,
+        });
+    } catch (error) {
+        console.error("Get Departments Error:", error);
+        res.status(500).json({ error: "Failed to retrieve departments" });
+    }
+};
+
+// Update a department (Super Admin only)
+const updateDepartment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description } = req.body;
+
+        // Check if another department with the same name exists
+        const existingDepartment = await Department.findOne({ name: { $regex: `^${name}$`, $options: "i" }, _id: { $ne: id } });
+        if (existingDepartment) {
+            return res.status(400).json({ error: "Another department with this name already exists" });
+        }
+
+        const department = await Department.findByIdAndUpdate(id, { name, description }, { new: true });
+        if (!department) return res.status(404).json({ error: "Department not found" });
+
+        res.status(200).json({ message: "Department updated successfully", department });
+    } catch (error) {
+        console.error("Update Department Error:", error);
+        res.status(500).json({ error: "Failed to update department" });
+    }
+};
+
+// Delete a department (Super Admin only)
+const deleteDepartment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const department = await Department.findByIdAndDelete(id);
+        if (!department) return res.status(404).json({ error: "Department not found" });
+
+        res.status(200).json({ message: "Department deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete department" });
+    }
+};
+
+// Get a single department by ID
+const getDepartmentById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const department = await Department.findById(id);
+        if (!department) return res.status(404).json({ error: "Department not found" });
+
+        res.status(200).json(department);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve department" });
+    }
+};
+
+
+module.exports = {
+    createDepartment,
+    getAllDepartments,
+    getDepartmentById,
+    updateDepartment,
+    deleteDepartment,
+};
+
+===== File: /controllers/medicalRecordController.js =====
+const MedicalRecord = require("../models/MedicalRecord");
+const Staff  = require("../models/Staff");
+const { generateMedicalSummary } = require("../services/medicalRecordService");
+
+
+/**
+ * Create a medical record
+ */
+const createMedicalRecord = async (req, res) => {
+  try {
+    // Ensure only doctors (or super admins) can create medical records
+    // console.log("req.user role::",req.user.role.name)
+    if (req.user.role.name !== "Doctor") {
+      return res.status(403).json({ message: "Unauthorized: Only doctors can create medical records" });
+    }
+
+    const { patient, diagnosis, treatment, notes, medications, symptoms } = req.body;
+
+    // Use the logged-in doctor's ID instead of getting it from the request body
+    const doctor = req.user.id; 
+
+    const newRecord = new MedicalRecord({ patient, doctor, diagnosis, treatment, notes, medications, symptoms });
+    await newRecord.save();
+
+    res.status(201).json({ message: "Medical record created successfully", record: newRecord });
+  } catch (error) {
+    console.error("Create Medical Record Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+/**
+ * Update a medical record
+ */
+const updateMedicalRecord = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const record = await MedicalRecord.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!record) {
+      return res.status(404).json({ message: "Medical record not found" });
+    }
+
+    res.status(200).json({ message: "Medical record updated successfully", record });
+  } catch (error) {
+    console.error("Update Medical Record Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Delete a medical record
+ */
+const deleteMedicalRecord = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const record = await MedicalRecord.findByIdAndDelete(id);
+
+    if (!record) {
+      return res.status(404).json({ message: "Medical record not found" });
+    }
+
+    res.status(200).json({ message: "Medical record deleted successfully" });
+  } catch (error) {
+    console.error("Delete Medical Record Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Get all medical records
+ */
+const getAllMedicalRecords = async (req, res) => {
+  try {
+    let { page, limit, search } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    let filter = {};
+    const staff = await Staff.findById(req.user.id).populate("role");
+
+    // Role-based access control
+    if (req.user.role.name === "Doctor") {
+      filter.doctor = req.user.id; // Doctors only see their own patients' records
+    } else if (req.user.role.name === "Nurse") {
+      // filter.department = staff.department; // Nurses can view records in their department
+    } else if (req.user.role.name === "Patient") {
+      filter.patient = req.user.id; // Patients only see their own records
+    }
+
+    // Fetch medical records with pagination and populate fields
+    let records = await MedicalRecord.find(filter)
+      .populate("patient", "firstName lastName")
+      .populate("doctor", "firstName lastName")
+      .skip(skip)
+      .limit(limit);
+
+    // Apply search filtering in JavaScript (since MongoDB regex doesn't work on populated fields)
+    if (search) {
+      const regex = new RegExp(search, "i");
+      records = records.filter(
+        (record) =>
+          regex.test(record.diagnosis) ||
+          regex.test(record.patient.firstName) ||
+          regex.test(record.patient.lastName) ||
+          regex.test(record.doctor.firstName) ||
+          regex.test(record.doctor.lastName)
+      );
+    }
+
+    // Count total medical records for pagination
+    const totalRecords = records.length; // Now counting after filtering
+
+    res.status(200).json({
+      records,
+      currentPage: page,
+      totalPages: Math.ceil(totalRecords / limit),
+      totalRecords,
+    });
+  } catch (error) {
+    console.error("Get Medical Records Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
+
+/**
+ * Get AI-generated medical summary for a patient
+ */
+const getMedicalSummary = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const summary = await generateMedicalSummary(patientId);
+    console.log("ai summary::", summary)
+    res.status(200).json({ summary });
+  } catch (error) {
+    console.error("Medical Summary Error:", error);
+    res.status(500).json({ message: "Failed to generate medical summary." });
+  }
+};
+
+
+module.exports = { createMedicalRecord, updateMedicalRecord, deleteMedicalRecord, getAllMedicalRecords, getMedicalSummary };
+
+
+===== File: /controllers/notificationController.js =====
+const Notification = require("../models/Notification");
+
+const getNotifications = async (req, res) => {
+  try {
+    console.log("Notification Query:", req.query);  
+
+    let { search, type, priority, read, page, limit, sortBy, sortOrder } = req.query;
+
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 20; 
+    const skip = (page - 1) * limit;
+
+    let filter = { user: req.user.id };
+
+    if (type) filter.type = type;
+    if (priority) filter.priority = priority;
+
+    // ✅ Fix: Match `isRead` field name in schema
+    if (read !== undefined) {
+      filter.isRead = read === "true" ? true : read === "false" ? false : undefined;
+    }
+
+    if (search) {
+      filter.message = { $regex: search, $options: "i" };
+    }
+
+    let sortOptions = { createdAt: -1 };
+    if (sortBy) {
+      sortOptions = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+    }
+
+    console.log("Filter being applied:", filter);
+
+    const notifications = await Notification.find(filter)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    const totalNotifications = await Notification.countDocuments(filter);
+
+    res.status(200).json({
+      success: true,
+      notifications,
+      currentPage: page,
+      totalPages: Math.ceil(totalNotifications / limit),
+      totalNotifications,
+    });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+/**
+ * Mark a single notification as read
+ */
+const markNotificationAsRead = async (req, res) => {
+  try {
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },  
+      { isRead: true },
+      { new: true }
+    );
+
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+
+    // Emit real-time update for unread count
+    if (global.io) {
+      const unreadCount = await Notification.countDocuments({ user: req.user.id, isRead: false });
+      global.io.to(req.user.id).emit("notificationCount", { count: unreadCount });
+    }
+
+    res.status(200).json({ message: "Notification marked as read", notification });
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Mark all notifications as read
+ */
+const markAllNotificationsAsRead = async (req, res) => {
+  try {
+    await Notification.updateMany({ user: req.user.id, isRead: false }, { isRead: true });
+
+    // Emit real-time notification count update
+    if (global.io) {
+      global.io.to(req.user.id).emit("notificationCount", { count: 0 });
+    }
+
+    res.status(200).json({ message: "All notifications marked as read" });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+module.exports = {
+  getNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+};
+
+
+===== File: /controllers/patientController.js =====
+const bcrypt = require("bcryptjs");
+const Patient = require("../models/Patient");
+const Role = require("../models/Role");
+const logger = require("../utils/logger");
+
+/**
+ * Create a new Patient
+ */
+const createPatient = async (req, res) => {
+  try {
+    console.log("body::", req.body);
+
+    const { firstName, lastName, email, phone, address, gender, dob } = req.body;
+
+    // Check if patient already exists
+    const existingPatient = await Patient.findOne({ email });
+    if (existingPatient) {
+      return res.status(400).json({ message: "Patient already exists." });
+    }
+
+    // Fetch the default patient role
+    const defaultRole = await Role.findOne({ name: "Patient" }).populate("permissions");
+    if (!defaultRole) {
+      return res.status(500).json({ message: "Default patient role not found. Please contact an administrator." });
+    }
+
+    // Use email as default password
+    const defaultPassword = email;
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    // Create new patient
+    let newPatient = new Patient({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+      gender,
+      dob,
+      userType: "Patient",
+      role: defaultRole._id, // Assign default role
+      isActive: true,
+      forcePasswordChange: true, // Force password change on first login
+      createdBy: req.user.id, // Track who created the patient
+    });
+
+    await newPatient.save();
+
+    // Fetch patient with populated role and permissions
+    newPatient = await Patient.findById(newPatient._id)
+      .populate({
+        path: "role",
+        select: "name", // Populate role name  
+       
+      })
+      .select("-password -__v") // Remove sensitive fields
+      .lean();
+
+    res.status(201).json({
+      message: "Patient created successfully. Default password has been set.",
+      patient: newPatient,
+    });
+  } catch (error) {
+    console.error("Create Patient Error::", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Update Patient
+ */
+const updatePatient = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, ...updatedData } = req.body; // Extract email separately
+
+    // Check if patient exists
+    const patient = await Patient.findById(id);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found." });
+    }
+
+    // If email is being updated, ensure it's unique
+    if (email && email !== patient.email) {
+      const existingPatient = await Patient.findOne({ email });
+      if (existingPatient) {
+        return res.status(400).json({ message: "Email is already in use by another patient." });
+      }
+      updatedData.email = email; // Only update email if it's unique
+    }
+
+    // Update the patient
+    const updatedPatient = await Patient.findByIdAndUpdate(id, updatedData, { new: true });
+
+    res.status(200).json({ message: "Patient updated successfully.", patient: updatedPatient });
+  } catch (error) {
+    logger.error("Update Patient Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Delete Patient
+ */
+const deletePatient = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const patient = await Patient.findByIdAndDelete(id);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found." });
+    }
+
+    res.status(200).json({ message: "Patient deleted successfully." });
+  } catch (error) {
+    logger.error("Delete Patient Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Get All Patients with Pagination
+ */
+const getAllPatients = async (req, res) => {
+  try {
+    let { search, page, limit } = req.query;
+
+    page = parseInt(page) || 1; // Default to page 1
+    limit = parseInt(limit) || 10000; // Default limit
+    const skip = (page - 1) * limit;
+
+    let query = {};
+
+    // 🔹 If the user is a Doctor, only show their assigned patients
+    console.log("getAllPatients user role::", req.user.role.name);
+    if (req.user.role.name === "Doctor") {
+      query.assignedDoctor = req.user.id;
+    }
+
+    // 🔹 Search filter (by first name, last name, email, phone)
+    if (search) {
+      query.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🔹 Get total count of matching patients
+    const p= await Patient.find()
+    console.log("p::", p)
+    const totalPatients = await Patient.countDocuments(query);
+
+    // 🔹 Fetch patients  
+    const patients = await Patient.find(query)
+      .skip(skip)
+      .limit(limit)
+       
+
+    res.status(200).json({
+      totalPatients,
+      totalPages: Math.ceil(totalPatients / limit),
+      currentPage: page,
+      patients,
+    });
+  } catch (error) {
+    logger.error("Get Patients Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+ 
+module.exports = { 
+  createPatient, 
+  updatePatient, 
+  deletePatient, 
+  getAllPatients
+};
+
+===== File: /controllers/permissionController.js =====
+const Permission = require("../models/Permission");
+
+// Create a new permission (Super Admin only)
+const createPermission = async (req, res) => {
+    try {
+        console.log("Permission body::", req.body);
+        const { action, description } = req.body;
+
+        const existingPermission = await Permission.findOne({ action });
+        if (existingPermission) {
+            console.log("Permission already exists");
+            return res.status(400).json({ error: "Permission already exists" });
+        }
+
+        const permission = new Permission({ action, description });
+        await permission.save();
+        console.log("Permission::", permission);
+
+        res.status(201).json({ message: "Permission created successfully.", permission });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to create permission" });
+    }
+};
+
+// Get all permissions with search & pagination
+const getAllPermissions = async (req, res) => {
+    try {
+        const { search, page = 1, limit = 10000 } = req.query;
+        const query = {};
+
+        // If search query exists, filter by action or description
+        if (search) {
+            query.$or = [
+                { action: { $regex: search, $options: "i" } }, // Case-insensitive search
+                { description: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        const totalPermissions = await Permission.countDocuments(query);
+        const permissions = await Permission.find(query)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
+
+        res.status(200).json({ total: totalPermissions, page, limit, permissions });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to retrieve permissions" });
+    }
+};
+
+// Get a single permission by ID (Super Admin only)
+const getPermissionById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const permission = await Permission.findById(id);
+        if (!permission) return res.status(404).json({ error: "Permission not found" });
+
+        res.status(200).json(permission);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to retrieve permission" });
+    }
+};
+
+// Update a permission (Super Admin only)
+const updatePermission = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action, description } = req.body;
+
+        // Ensure no duplicate permission actions
+        const existingPermission = await Permission.findOne({ action, _id: { $ne: id } });
+        if (existingPermission) {
+            return res.status(400).json({ error: "A permission with this action already exists." });
+        }
+
+        const permission = await Permission.findByIdAndUpdate(id, { action, description }, { new: true });
+
+        if (!permission) return res.status(404).json({ error: "Permission not found" });
+
+        res.status(200).json({ message: "Permission updated successfully", permission });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to update permission" });
+    }
+};
+
+// Delete a permission (Super Admin only)
+const deletePermission = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const permission = await Permission.findByIdAndDelete(id);
+        if (!permission) return res.status(404).json({ error: "Permission not found" });
+
+        res.status(200).json({ message: "Permission deleted successfully" });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to delete permission" });
+    }
+};
+
+module.exports = {
+    createPermission,
+    getAllPermissions,
+    getPermissionById,
+    updatePermission,
+    deletePermission,
+};
+
+===== File: /controllers/roleController.js =====
+const Role = require("../models/Role");
+const Permission = require("../models/Permission");
+
+/**
+ * Create a new role
+ */
+const createRole = async (req, res) => {
+  try {
+    const { name, permissions } = req.body;
+
+    // Validate permissions
+    const validPermissions = await Permission.find({ _id: { $in: permissions } });
+    if (validPermissions.length !== permissions.length) {
+      return res.status(400).json({ message: "Invalid permissions provided." });
+    }
+
+    const newRole = new Role({ name, permissions });
+    await newRole.save();
+
+    res.status(201).json({ message: "Role created successfully.", role: newRole });
+  } catch (error) {
+    console.error("Create Role Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Update an existing role
+ */
+const updateRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("role body update::", req.body, id)
+    const { name, permissions } = req.body;
+
+    const role = await Role.findById(id);
+    if (!role) {
+      return res.status(404).json({ message: "Role not found." });
+    }
+
+    // Validate permissions
+    const validPermissions = await Permission.find({ _id: { $in: permissions } });
+    if (validPermissions.length !== permissions.length) {
+      return res.status(400).json({ message: "Invalid permissions provided." });
+    }
+
+    role.name = name;
+    role.permissions = permissions;
+    await role.save();
+
+    res.status(200).json({ message: "Role updated successfully.", role });
+  } catch (error) {
+    console.error("Update Role Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Delete a role
+ */
+const deleteRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const role = await Role.findById(id);
+    if (!role) {
+      return res.status(404).json({ message: "Role not found." });
+    }
+
+    await Role.findByIdAndDelete(id);
+    res.status(200).json({ message: "Role deleted successfully." });
+  } catch (error) {
+    console.error("Delete Role Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+/**
+ * Get a specific role by ID
+ */
+const getRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const role = await Role.findById(id).populate("permissions", "action description");
+    if (!role) {
+      return res.status(404).json({ message: "Role not found." });
+    }
+
+    res.status(200).json({ role });
+  } catch (error) {
+    console.error("Get Role Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+/**
+ * Get all roles with pagination and search
+ */
+const getAllRoles = async (req, res) => {
+  try {
+    let { page, limit, search } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    // Search filter (if search query is provided)
+    const filter = search
+      ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
+      : {};
+
+    const roles = await Role.find(filter)
+      .populate("permissions", "action description")
+      .skip(skip)
+      .limit(limit);
+
+    const totalRoles = await Role.countDocuments(filter);
+
+    res.status(200).json({
+      roles,
+      currentPage: page,
+      totalPages: Math.ceil(totalRoles / limit),
+      totalRoles,
+    });
+  } catch (error) {
+    console.error("Get Roles Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { createRole, updateRole, deleteRole, getRole, getAllRoles };
+
+
+===== File: /controllers/shiftController.js =====
+const Shift = require("../models/Shift");
+const User = require("../models/User");
+const { sendNotification } = require("../services/notificationService");
+
+/**
+ * ✅ Assign a Shift (Admin only)
+ */
+const assignShift = async (req, res) => {
+  try {
+    const { staff, department, date, startTime, endTime, type } = req.body;
+
+    // 🔍 Check if staff exists
+    const staffMember = await User.findById(staff);
+    if (!staffMember) {
+      return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    // ⛔ Prevent Overlapping Shifts
+    const existingShift = await Shift.findOne({
+      staff,
+      date,
+      $or: [
+        { startTime: { $lt: endTime }, endTime: { $gt: startTime } }, // Time overlap check
+      ],
+    });
+
+    if (existingShift) {
+      return res.status(400).json({ message: "Shift overlaps with an existing shift." });
+    }
+
+    // 📝 Create shift
+    const shift = new Shift({
+      staff,
+      department,
+      date,
+      startTime,
+      endTime,
+      type,
+      status: "scheduled",
+    });
+
+    await shift.save();
+
+    // 📢 Send Notification to Staff
+    await sendNotification(
+      staff,
+      `📢 You have been assigned a ${type} shift on ${date}.`,
+      "system"
+    );
+
+    res.status(201).json({ message: "Shift assigned successfully", shift });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+/**
+ * 📌 Get All Shifts (Filter by Date, Staff, Department)
+ */
+ 
+const getShifts = async (req, res) => {
+  try {
+    let { date, staff, department, search, page, limit, sortBy, sortOrder } = req.query;
+    
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+
+    if (date) query.date = date;
+    if (staff) query.staff = staff;
+    if (department) query.department = department;
+
+    // Search functionality (search in staff name or department name)
+    if (search) {
+      query.$or = [
+        { "staff.firstName": { $regex: search, $options: "i" } },
+        { "staff.lastName": { $regex: search, $options: "i" } },
+        { "department.name": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Sorting Logic
+    let sortOptions = { date: 1 }; // Default sorting by earliest date
+    if (sortBy) {
+      sortOptions = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+    }
+
+    // Fetch shifts with pagination and sorting
+    const shifts = await Shift.find(query)
+      .populate("staff", "firstName lastName")
+      .populate("department", "name")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    // Count total matching shifts for pagination
+    const totalShifts = await Shift.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      shifts,
+      currentPage: page,
+      totalPages: Math.ceil(totalShifts / limit),
+      totalShifts,
+    });
+  } catch (error) {
+    console.error("Error fetching shifts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+/**
+ * ✅ Get Shifts for the Logged-in Staff Member (With Sorting)
+ */
+const getMyShifts = async (req, res) => {
+  try {
+    const staffId = req.user.id; // Get logged-in user's ID
+    let { date, search, page, limit, sortBy, sortOrder } = req.query;
+    
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    let query = { staff: staffId };
+
+    if (date) query.date = date; // Filter by specific date
+
+    // Search functionality (search in department name)
+    if (search) {
+      query.$or = [{ "department.name": { $regex: search, $options: "i" } }];
+    }
+
+    // Sorting Logic
+    let sortOptions = { date: 1 }; // Default sorting by earliest date
+    if (sortBy) {
+      sortOptions = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+    }
+
+    // Fetch shifts with pagination & sorting
+    const shifts = await Shift.find(query)
+      .populate("staff", "firstName lastName")
+      .populate("department", "name")
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    // Count total matching shifts
+    const totalShifts = await Shift.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      shifts,
+      currentPage: page,
+      totalPages: Math.ceil(totalShifts / limit),
+      totalShifts,
+    });
+  } catch (error) {
+    console.error("Error fetching user shifts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+/**
+ * 🛠️ Update Shift (Reschedule or Cancel)
+ */
+const updateShift = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, startTime, endTime, type, status } = req.body;
+
+    const shift = await Shift.findById(id);
+    if (!shift) {
+      return res.status(404).json({ message: "Shift not found" });
+    }
+
+    // Prevent overlap when rescheduling
+    if (date || startTime || endTime) {
+      const overlappingShift = await Shift.findOne({
+        staff: shift.staff,
+        date: date || shift.date,
+        $or: [
+          { startTime: { $lt: endTime || shift.endTime }, endTime: { $gt: startTime || shift.startTime } },
+        ],
+        _id: { $ne: shift._id },
+      });
+
+      if (overlappingShift) {
+        return res.status(400).json({ message: "Rescheduled shift overlaps with another shift." });
+      }
+    }
+
+    if (date) shift.date = date;
+    if (startTime) shift.startTime = startTime;
+    if (endTime) shift.endTime = endTime;
+    if (type) shift.type = type;
+    if (status) shift.status = status;
+
+    await shift.save();
+
+    // 📢 Notify Staff about the update
+    await sendNotification(
+      shift.staff,
+      `📢 Your shift on ${shift.date} has been updated.`,
+      "system"
+    );
+
+    res.json({ message: "Shift updated successfully", shift });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+/**
+ * ❌ Delete Shift (Cancel)
+ */
+const deleteShift = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const shift = await Shift.findById(id);
+    if (!shift) {
+      return res.status(404).json({ message: "Shift not found" });
+    }
+
+    await Shift.deleteOne({ _id: id });
+
+    // 📢 Notify Staff about Cancellation
+    await sendNotification(
+      shift.staff,
+      `⚠️ Your shift on ${shift.date} has been canceled.`,
+      "system"
+    );
+
+    res.json({ message: "Shift canceled successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+module.exports = {
+  assignShift,
+  getShifts,
+  getMyShifts,  
+  updateShift,
+  deleteShift,
+};
+
+
+===== File: /controllers/staffController.js =====
+const Staff = require("../models/Staff");
+const User = require("../models/User");
+const Role = require("../models/Role");
+const Department = require("../models/Department");
+const bcrypt = require("bcryptjs");
+
+/**
+ * Create a new staff member
+ */
+const createStaff = async (req, res) => {
+  try {
+    console.log("body::", req.body)
+    const { firstName, lastName, email, phone, dob, address, gender, role, department } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Staff member already exists." });
+    }
+   // Prevent non-Super Admins from creating another Super Admin
+   const _role = await Role.findOne({ name: role }).populate("permissions");
+   if (!_role) return res.status(400).json({ message: "Invalid staff role." });
+
+   if (_role.name === "Super Admin" && req.user.role.name !== "Super Admin") {
+     return res.status(403).json({ message: "Only Super Admins can create Super Admins." });
+   }
+    // Use email as default password for reset later
+    const defaultPassword = email;
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    // Validate department
+    const departmentDoc = await Department.findOne({ name: department });
+    if (!departmentDoc) return res.status(400).json({ message: "Invalid department." });
+
+    // Create staff user
+    let newUser = new Staff({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      phone,
+      address,
+      gender,
+      userType: "Staff",
+      dob,
+      role: _role._id,
+      department: departmentDoc._id,
+      isActive: true,
+      forcePasswordChange: true, // Force password change on first login
+      createdBy: req.user.id, // Track who created the patient
+
+    });
+
+    await newUser.save();
+
+    newUser = await Staff.findById(newUser._id)
+      .populate("role", "name")
+      .populate("department", "name")
+      .select("-password -__v")
+      .lean();
+
+    res.status(201).json({
+      message: "Staff member created successfully. Default password has been set.",
+      staff: newUser,
+    });
+  } catch (error) {
+    console.log("error::", error)
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Update staff details
+ */
+const updateStaff = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, role, department, ...updateData } = req.body;
+    
+    console.log("body::", req.body);
+
+    let staff = await Staff.findById(id).populate("role", "name").populate("department", "name");
+    if (!staff) return res.status(404).json({ message: "Staff not found." });
+
+    // Check if email is being updated and if it's already taken
+    if (email && email !== staff.email) {
+      const emailExists = await Staff.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email is already in use by another staff member." });
+      }
+      updateData.email = email;
+    }
+
+    // Prevent Admins from modifying Super Admins
+    if (staff.role.name === "Super Admin" && req.user.role.name !== "Super Admin") {
+      return res.status(403).json({ message: "You cannot modify a Super Admin." });
+    }
+
+    // Update staff role if provided
+    if (role) {
+      const newRole = await Role.findById(role);
+      if (!newRole) return res.status(400).json({ message: "Invalid role." });
+
+      if (newRole.name === "Super Admin" && req.user.role.name !== "Super Admin") {
+        return res.status(403).json({ message: "Only Super Admins can assign Super Admin roles." });
+      }
+      updateData.role = newRole._id;
+    }
+
+    // Update department if provided
+    if (department) {
+      const newDepartment = await Department.findById(department);
+      if (!newDepartment) return res.status(400).json({ message: "Invalid department." });
+
+      updateData.department = newDepartment._id;
+    }
+
+    // Apply updates
+    Object.assign(staff, updateData);
+    await staff.save();
+
+    // Refetch updated staff with populated fields
+    staff = await Staff.findById(id)
+      .populate("role", "name")
+      .populate("department", "name");
+
+    res.status(200).json({ message: "Staff updated successfully.", staff });
+  } catch (error) {
+    console.log("error::", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Delete staff
+ */
+const deleteStaff = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let staff = await Staff.findById(id).populate("role", "name");
+
+    if (!staff) return res.status(404).json({ message: "Staff not found." });
+
+    // Prevent Admins from deleting Super Admins
+    if (staff.role.name === "Super Admin" && req.user.role.name !== "Super Admin") {
+      return res.status(403).json({ message: "You cannot delete a Super Admin." });
+    }
+
+    await staff.deleteOne();
+    res.status(200).json({ message: "Staff deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+/**
+ * Get all staff members with pagination and search
+ */
+const getAllStaff = async (req, res) => {
+  try {
+    let filter = {};
+
+    // Restrict non-Super Admin users from seeing Super Admins
+    if (req.user.role.name !== "Super Admin") {
+      const superAdminRole = await Role.findOne({ name: "Super Admin" });
+      if (superAdminRole) filter.role = { $ne: superAdminRole._id };
+    }
+
+    // Pagination parameters
+    let { page, limit, search, department } = req.query;
+    console.log("got dep::", department)
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10000;
+    const skip = (page - 1) * limit;
+
+    // Add search filter (search by name, email, or phone)
+    if (search) {
+      filter.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Add department filter if provided
+    if (department) {
+      filter.department = department; // Assuming department is the ObjectId
+    }
+
+    // Fetch paginated staff list
+    const staff = await Staff.find(filter)
+      .populate("department", "name")
+      .populate("role", "name")
+      .select("-password -__v")
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination metadata
+    const totalStaff = await Staff.countDocuments(filter);
+    
+    res.status(200).json({
+      staff,
+      currentPage: page,
+      totalPages: Math.ceil(totalStaff / limit),
+      totalStaff,
+    });
+  } catch (error) {
+    console.error("Get All Staff Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
+
+module.exports = { createStaff, updateStaff, deleteStaff, getAllStaff };
+
+
+===== File: /controllers/taskController.js =====
+const Task = require("../models/Task");
+const Staff = require("../models/Staff");
+const Role = require("../models/Role");
+const checkPermission = require("../middlewares/checkPermission");
+const { sendNotification } = require("../services/notificationService");
+
+const createTask = async (req, res) => {
+  console.log("In createTask", req.user);
+  try {
+    const { title, description, assignedTo, type, priority } = req.body; // assignedTo is actually the patient ID
+
+    // ✅ Validate Task Type
+    const validTypes = [ "medical_record", "discharge", "prescription"];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ message: "Invalid task type." });
+    }
+
+    // ✅ Ensure Only Doctors Can Create Certain Tasks
+    if ((type === "medical_record" || type === "discharge" || type === "prescription" || type === "discharge" || type === "lab_test") && req.user.role.name !== "Doctor") {
+      return res.status(403).json({ message: `Only doctors can create ${type} tasks.` });
+    }
+
+    // ✅ Ensure Patient ID (assignedTo) is Provided for Medical Record & Discharge
+    if (!assignedTo) {
+      return res.status(400).json({ message: "Patient ID is required for this task type." });
+    }
+
+    let finalAssignedTo = null;
+
+     
+      // Get the Doctor's Department
+      const doctor = await Staff.findById(req.user.id).populate("department");
+      if (!doctor || !doctor.department) {
+        return res.status(400).json({ message: "Doctor does not belong to any department." });
+      }
+
+    // Get the Nurse role ID
+const nurseRole = await Role.findOne({ name: "Nurse" });  
+if (!nurseRole) {
+  return res.status(500).json({ message: "Nurse role not found." });
+}
+
+  // Find an available Nurse in the same department
+  const nurse = await Staff.findOne({
+    role: nurseRole._id,  
+    department: doctor.department._id,
+    isActive: true,
+  }).sort({ tasksAssigned: 1 }); // Assign to the least busy nurse
+
+  if (!nurse) {
+    return res.status(404).json({ message: "No available nurses in this department." });
+  }
+
+  finalAssignedTo = nurse._id; // ✅ Assign task to this nurse
+    
+
+    // ✅ Create the Task
+    const task = new Task({
+      title,
+      description,
+      assignedTo: finalAssignedTo, // Nurse's ID or manually assigned staff
+      createdBy: req.user.id,
+      type,
+      priority: priority || "medium",
+      status: "pending",
+      patient: assignedTo, // Store patient ID correctly
+    });
+
+    await task.save();
+
+    // ✅ Send Notification to Assigned Staff (Nurse or Assigned Staff)
+    await sendNotification(finalAssignedTo, `You have a new task: ${title}`, "task");
+
+    // ✅ Emit WebSocket Event
+    if (global.io) {
+      global.io.to(finalAssignedTo.toString()).emit("newTask", {
+        message: "You have a new task",
+        taskId: task._id,
+      });
+    }
+
+    res.status(201).json({ success: true, message: "Task created and assigned", task });
+  } catch (error) {
+    console.error("Error creating task:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+// ✅ Get Task by ID
+const getTaskById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findById(id).populate("assignedTo", "name email").populate("createdBy", "name email");
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // ✅ Check "view_task" Permission
+    if (!checkPermission(req.user, "view_task")) {
+      return res.status(403).json({ message: "Unauthorized to view this task" });
+    }
+
+    res.status(200).json({ success: true, task });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// ✅ Get All Tasks (Search, Pagination, Filtering)
+const getAllTasks = async (req, res) => {
+  try {
+    let { search, status, page, limit, sortBy, sortOrder } = req.query;
+
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+    if (status) query.status = status;
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+    // Sorting (default: newest first)
+    let sortOptions = { createdAt: -1 };
+    if (sortBy) {
+      sortOptions = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+    }
+
+    const tasks = await Task.find(query)
+      .populate("assignedTo", "firstName lastName") // Populate assignedTo
+      .populate("createdBy", "firstName lastName ") // Populate createdBy
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    const totalTasks = await Task.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      tasks,
+      currentPage: page,
+      totalPages: Math.ceil(totalTasks / limit),
+      totalTasks,
+    });
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// ✅ Update Task (Only Task Creator/Admin)
+const updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const task = await Task.findById(id);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // ✅ Ensure Only Creator/Admin Can Update Task
+    if (task.createdBy.toString() !== req.user.id && !checkPermission(req.user, "update_task")) {
+      return res.status(403).json({ message: "Unauthorized to update this task" });
+    }
+
+    Object.assign(task, updates);
+    await task.save();
+
+    res.status(200).json({ success: true, message: "Task updated", task });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+}; 
+
+// ✅ Delete Task (Only Task Creator/Admin)
+const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const task = await Task.findById(id);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // ✅ Ensure Only Creator/Admin Can Delete Task
+    if (task.createdBy.toString() !== req.user.id && !checkPermission(req.user, "delete_task")) {
+      return res.status(403).json({ message: "Unauthorized to delete this task" });
+    }
+
+    await task.deleteOne();
+
+    res.status(200).json({ success: true, message: "Task deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// ✅ Complete Task (Only Assigned User)
+const completeTask = async (req, res) => {
+  console.log("in complete task")
+  try {
+    const { id } = req.params;
+    const task = await Task.findById(id);
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // ✅ Ensure Only Assigned User Completes the Task
+    if (task.assignedTo.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized to complete this task" });
+    }
+
+    task.status = "completed";
+    await task.save();
+
+    // ✅ Send Notification to Task Creator
+    await sendNotification(task.createdBy.toString(), `Task "${task.title}" has been completed.`, "task");
+
+    // ✅ Emit WebSocket Event
+    if (global.io) {
+      global.io.to(task.createdBy.toString()).emit("taskCompleted", {
+        message: "A task has been completed",
+        taskId: task._id,
+      });
+    }
+
+    res.status(200).json({ success: true, message: "Task marked as completed", task });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// ✅ Get Tasks Assigned to or Created by the Logged-In User
+const getMyTasks = async (req, res) => {
+  try {
+    console.log("mytasks query::", req.query);
+    let { search, status, page, limit, sortBy, sortOrder } = req.query;
+
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const skip = (page - 1) * limit;
+
+    let query = {
+      $or: [
+        { assignedTo: req.user.id }, // Tasks assigned to the user
+        { createdBy: req.user.id },  // Tasks created by the user
+      ],
+    };
+
+    if (status) query.status = status;
+
+    if (search) {
+      query.$or.push(
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      );
+    }
+
+    const tasks = await Task.find(query)
+      .populate("assignedTo", "firstName lastName") // Populate assignedTo
+      .populate("createdBy", "firstName lastName ") // Populate createdBy
+      .sort({ [sortBy || "createdAt"]: sortOrder === "desc" ? -1 : 1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalTasks = await Task.countDocuments(query);
+
+    res.status(200).json({
+      message: "Tasks retrieved successfully.",
+      tasks,
+      totalTasks,
+      currentPage: page,
+      totalPages: Math.ceil(totalTasks / limit),
+    });
+  } catch (error) {
+    console.error("Get My Tasks Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
+module.exports = { createTask, getTaskById, getAllTasks,  getMyTasks, updateTask, deleteTask, completeTask };
+
+
+===== File: /config/db.js =====
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('✅ MongoDB Connected Successfully');
+    } catch (error) {
+        console.error('❌ MongoDB Connection Failed:', error.message);
+        process.exit(1); // Exit process with failure
+    }
+};
+
+module.exports = connectDB;
+
+
+===== File: /models/Appointment.js =====
+const mongoose = require("mongoose");
+
+const AppointmentSchema = new mongoose.Schema(
+  {
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      required: true,
+    },
+    doctor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+      required: true,
+    },
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department", // Link to department
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "rescheduled", "canceled"],
+      default: "pending",
+    },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff", // Assigned Receptionist
+    },
+    confirmedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff", // Receptionist who confirmed it
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Appointment", AppointmentSchema);
+
+
+===== File: /models/AuditLog.js =====
+const mongoose = require("mongoose");
+
+const AuditLogSchema = new mongoose.Schema(
+  {
+    action: { 
+      type: String, 
+      required: true, 
+      enum: ["create", "update", "delete", "access"] 
+    },
+    entity: { 
+      type: String, 
+      required: true 
+    }, // Tracks entity type (e.g., "Patient", "Appointment")
+    entityId: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      refPath: "entity", 
+      required: false 
+    }, // Optional, links to affected entity
+    performedBy: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      refPath: "performedByModel", 
+      required: false 
+    }, // Who performed the action
+    performedByModel: { 
+      type: String, 
+      enum: ["Staff", "Patient", "System"], 
+      required: false 
+    }, // Identifies if action was done by staff, patient, or system
+    details: { 
+      type: String 
+    }, // Extra details about the action
+    before: { 
+      type: mongoose.Schema.Types.Mixed 
+    }, // Stores previous data (for updates/deletes)
+    after: { 
+      type: mongoose.Schema.Types.Mixed 
+    }, // Stores new data (for updates)
+    timestamp: { 
+      type: Date, 
+      default: Date.now 
+    }
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("AuditLog", AuditLogSchema);
+
+
+===== File: /models/BlacklistedToken.js =====
+const mongoose = require("mongoose");
+
+const BlacklistedTokenSchema = new mongoose.Schema({
+    token: { type: String, required: true, unique: true },
+    expiresAt: { type: Date, required: true } // Expiry same as JWT expiration
+});
+
+module.exports = mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
+
+
+===== File: /models/Department.js =====
+const mongoose = require("mongoose");
+
+const DepartmentSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true }, // e.g., "Cardiology", "Neurology"
+    description: { type: String },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Department", DepartmentSchema);
+
+
+===== File: /models/MedicalRecord.js =====
+const mongoose = require("mongoose");
+const createAuditLog = require("../middlewares/auditMiddleware");
+
+const MedicalRecordSchema = new mongoose.Schema(
+  {
+    patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
+    doctor: { type: mongoose.Schema.Types.ObjectId, ref: "Staff", required: true },
+    diagnosis: { type: String, required: true },
+    treatment: { type: String },
+    medications: [{ type: String }], // List of prescribed meds
+    symptoms: [{ type: String }],
+    notes: { type: String },
+    visitDate: { type: Date, default: Date.now }, 
+  },
+  { timestamps: true }
+);
+createAuditLog(MedicalRecordSchema, "MedicalRecord");
+module.exports = mongoose.model("MedicalRecord", MedicalRecordSchema);
+
+
+===== File: /models/Notification.js =====
+const mongoose = require("mongoose");
+
+const notificationSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    message: { type: String, required: true },
+    type: { 
+      type: String, 
+      enum: ["appointment", "medical_record", "reminder", "system", "shift"], 
+      required: true 
+    },
+    priority: { 
+      type: String, 
+      enum: ["urgent", "warning", "info"], 
+      default: "info" 
+    },
+    isRead: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+const Notification = mongoose.model("Notification", notificationSchema);
+module.exports = Notification;
+
+
+===== File: /models/Patient.js =====
+const mongoose = require("mongoose");
+const createAuditLog = require("../middlewares/auditMiddleware");
+
+const User = require("./User");
+
+const PatientSchema = new mongoose.Schema(
+  {
+  
+    assignedDoctor: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
+    medicalRecords: [{ type: mongoose.Schema.Types.ObjectId, ref: "MedicalRecord" }],
+    role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },  
+
+  },
+  { timestamps: true }
+);
+
+// Apply audit log middleware
+createAuditLog(PatientSchema, "Patient");
+
+module.exports = User.discriminator("Patient", PatientSchema);
+
+
+===== File: /models/Permission.js =====
+const mongoose = require('mongoose');
+
+const PermissionSchema = new mongoose.Schema({
+    action: { type: String, required: true, unique: true },
+    description: { type: String }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Permission', PermissionSchema);
+
+
+===== File: /models/Role.js =====
+const mongoose = require('mongoose');
+
+const RoleSchema = new mongoose.Schema(
+    {
+      name: { type: String, required: true, unique: true }, // e.g., Doctor, Nurse, Receptionist
+      permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Permission" }], // Role-based permissions
+    },
+    { timestamps: true }
+  );
+  
+module.exports = mongoose.model('Role', RoleSchema);
+
+===== File: /models/Shift.js =====
+const mongoose = require("mongoose");
+
+const ShiftSchema = new mongoose.Schema(
+  {
+    staff: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Assigned staff member
+    department: { type: mongoose.Schema.Types.ObjectId, ref: "Department", required: true }, // Department of the shift
+    date: { type: Date, required: true }, // Shift Date
+    startTime: { type: String, required: true }, // Start time (e.g., "08:00 AM")
+    endTime: { type: String, required: true }, // End time (e.g., "04:00 PM")
+    type: { type: String, enum: ["morning", "evening", "night"], required: true }, // Shift type
+    status: { type: String, enum: ["scheduled", "completed", "cancelled"], default: "scheduled" }, // Shift status
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Shift", ShiftSchema);
+
+
+===== File: /models/Staff.js =====
+const mongoose = require("mongoose");
+const createAuditLog = require("../middlewares/auditMiddleware");
+
+const User = require("./User");
+
+const StaffSchema = new mongoose.Schema(
+  {
+    role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
+    department: { type: mongoose.Schema.Types.ObjectId, ref: "Department", required: true }, 
+  },
+  { timestamps: true }
+);
+
+// Apply audit log middleware
+createAuditLog(StaffSchema, "Staff");
+module.exports = User.discriminator("Staff", StaffSchema);
+
+
+===== File: /models/Task.js =====
+const mongoose = require("mongoose");
+
+const TaskSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "Staff", required: true },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Staff", required: true },
+    type: { type: String, enum: ["lab_test", "medical_record", "discharge", "prescription", "appointment"], required: true },
+    status: { type: String, enum: ["pending", "in_progress", "completed"], default: "pending" },
+    priority: { type: String, enum: ["low", "medium", "high"], default: "medium" },
+    patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: false},
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Task", TaskSchema);
+
+
+===== File: /models/User.js =====
+const mongoose = require("mongoose");
+
+const UserSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    forcePasswordChange: { type: Boolean, default: true },
+    phone: { type: String },
+    dob: { type: Date },
+    address: { type: String },
+    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
+    userType: { type: String, enum: ["Patient", "Staff"], required: true },
+    isActive: { type: Boolean, default: true },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }
+
+  },
+  { timestamps: true, discriminatorKey: "userType" }
+);
+
+module.exports = mongoose.model("User", UserSchema);
+
+
+===== File: /routes/appointmentRoutes.js =====
+const express = require("express");
+const {
+  createAppointment,
+  updateAppointment,
+  deleteAppointment,
+  getAllAppointments,
+} = require("../controllers/appointmentController");
+
+const checkPermission = require("../middlewares/checkPermission");
+const authMiddleware = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+router.post("/", authMiddleware, checkPermission("create_appointment"), createAppointment);
+router.put("/:id", authMiddleware, checkPermission("update_appointment"), updateAppointment);
+router.delete("/:id", authMiddleware, checkPermission("delete_appointment"), deleteAppointment);
+router.get("/", authMiddleware, checkPermission("view_appointment"), getAllAppointments);
+
+module.exports = router;
+
+
+===== File: /routes/auditRoutes.js =====
+const express = require("express");
+const { getAuditLogs } = require("../controllers/auditController");
+const authenticate = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+// Route to fetch audit logs (Only users with "view_audit_logs" permission)
+router.get("/", authenticate, checkPermission("view_audit_logs"), getAuditLogs);
+
+module.exports = router;
+
+
+===== File: /routes/authRoutes.js =====
+const express = require("express");
+const { register, login, getProfile, logout, resetPassword } = require("../controllers/authController");
+const authenticate  = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+// Public Routes
+router.post("/register", register);
+router.post("/login", login);
+
+// Protected Route - Only Authenticated Users
+router.get("/profile", authenticate , getProfile);
+router.post("/reset-password",  authenticate, resetPassword);
+router.post("/logout",  authenticate, logout);
+module.exports = router;
+
+
+===== File: /routes/departmentRoutes.js =====
+const express = require("express");
+const { 
+  createDepartment, 
+  getAllDepartments, 
+  getDepartmentById,  
+  updateDepartment, 
+  deleteDepartment 
+} = require("../controllers/departmentController");
+
+const authenticate = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+router.post("/", authenticate, checkPermission("create_department"), createDepartment);
+router.get("/", authenticate, checkPermission("view_department"), getAllDepartments);
+router.get("/:id", authenticate, checkPermission("view_department"), getDepartmentById); 
+router.put("/:id", authenticate, checkPermission("update_department"), updateDepartment);
+router.delete("/:id", authenticate, checkPermission("delete_department"), deleteDepartment);
+
+module.exports = router;
+
+
+===== File: /routes/medicalRecordRoutes.js =====
+const express = require("express");
+const {
+  createMedicalRecord,
+  updateMedicalRecord,
+  deleteMedicalRecord,
+  getAllMedicalRecords,
+  getMedicalSummary, 
+} = require("../controllers/medicalRecordController");
+
+const checkPermission = require("../middlewares/checkPermission");
+const authenticate = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+router.post("/", authenticate, checkPermission("create_medical_record"), createMedicalRecord);
+router.put("/:id", authenticate, checkPermission("update_medical_record"), updateMedicalRecord);
+router.delete("/:id", authenticate, checkPermission("delete_medical_record"), deleteMedicalRecord);
+router.get("/", authenticate, checkPermission("view_medical_record"), getAllMedicalRecords);
+router.get("/:patientId/summary", authenticate, checkPermission("view_medical_record"), getMedicalSummary); // ✅ Secure AI Summary
+
+module.exports = router;
+
+
+===== File: /routes/notificationRoutes.js =====
+const express = require("express");
+const { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } = require("../controllers/notificationController");
+const authenticate = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+router.get("/", authenticate, getNotifications);
+router.put("/:id/read", authenticate, markNotificationAsRead);
+router.put("/read/all", authenticate, markAllNotificationsAsRead);
+
+module.exports = router;
+
+
+===== File: /routes/patientRoutes.js =====
+const express = require("express");
+const { createPatient, updatePatient, deletePatient, getAllPatients } = require("../controllers/patientController");
+const  authenticate  = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+// 🔒 Super Admins & Admins (with permission) can create patients
+router.post("/", authenticate, checkPermission("create_patient"), createPatient);
+
+// 🔒 Only Super Admins (or assigned roles) can remove patients
+router.delete("/:id", authenticate, checkPermission("delete_patient"), deletePatient);
+
+// 🔒 Admins (with permission) can update patients
+router.put("/:id", authenticate, checkPermission("update_patient"), updatePatient);
+
+// 🔓 Viewing patients can be restricted if needed
+router.get("/", authenticate, checkPermission("view_patient"), getAllPatients);
+
+module.exports = router;
+
+
+===== File: /routes/permissionRoutes.js =====
+const express = require("express");
+const { 
+    createPermission, 
+    getAllPermissions, 
+    getPermissionById, 
+    updatePermission, 
+    deletePermission 
+} = require("../controllers/permissionController");
+
+const authenticate = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+router.post("/", authenticate, checkPermission("create_permission"), createPermission);
+router.get("/", authenticate, checkPermission("view_permission"), getAllPermissions);
+router.get("/:id", authenticate, checkPermission("view_permission"), getPermissionById);
+router.put("/:id", authenticate, checkPermission("update_permission"), updatePermission);
+router.delete("/:id", authenticate, checkPermission("delete_permission"), deletePermission);
+
+module.exports = router;
+
+
+===== File: /routes/roleRoutes.js =====
+const express = require("express");
+const {
+  createRole,
+  updateRole,
+  deleteRole,
+  getRole,
+  getAllRoles
+} = require("../controllers/roleController");
+const authenticate = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+router.post("/", authenticate, checkPermission("assign_role"), createRole);
+router.put("/:id", authenticate, checkPermission("update_role"), updateRole);
+router.delete("/:id", authenticate, checkPermission("delete_role"), deleteRole);
+router.get("/:id", authenticate, checkPermission("view_role"), getRole)
+router.get("/", authenticate, checkPermission("view_role"), getAllRoles);
+
+module.exports = router;
+
+
+===== File: /routes/shiftRoutes.js =====
+const express = require("express");
+const { 
+  assignShift, 
+  getShifts, 
+  updateShift, 
+  deleteShift, 
+  getMyShifts // ✅ Add this function 
+} = require("../controllers/shiftController");
+const authenticate = require("../middlewares/authMiddleware");
+const checkPermission = require("../middlewares/checkPermission");
+
+const router = express.Router();
+
+// 📌 Shift Management Routes
+router.post("/", authenticate, checkPermission("create_shift"), assignShift);
+router.get("/", authenticate, checkPermission("view_shift"), getShifts);
+router.put("/:id", authenticate, checkPermission("update_shift"), updateShift);
+router.delete("/:id", authenticate, checkPermission("delete_shift"), deleteShift);
+
+// ✅ New Route: Staff Fetch Their Own Shifts
+router.get("/mine", authenticate, getMyShifts);
+
+module.exports = router;
+
+
+===== File: /routes/staffRoutes.js =====
+const express = require("express");
+const {
+  createStaff,
+  updateStaff,
+  deleteStaff,
+  getAllStaff,
+} = require("../controllers/staffController");
+const checkPermission = require("../middlewares/checkPermission");
+const authenticate  = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+// ✅ Admins & Super Admins can manage staff (with correct permissions)
+router.post("/", authenticate, checkPermission("create_staff"), createStaff);
+router.put("/:id", authenticate, checkPermission("update_staff"), updateStaff);
+router.delete("/:id", authenticate, checkPermission("delete_staff"), deleteStaff);
+router.get("/", authenticate, checkPermission("view_staff"), getAllStaff);
+
+module.exports = router;
+
+
+===== File: /routes/taskRoutes.js =====
+const express = require("express");
+const { 
+  createTask, 
+  getTaskById, 
+  getAllTasks, 
+  getMyTasks,  // ✅ Added getMyTasks
+  updateTask, 
+  deleteTask, 
+  completeTask 
+} = require("../controllers/taskController");
+
+const checkPermission = require("../middlewares/checkPermission");
+const authenticate  = require("../middlewares/authMiddleware");
+
+const router = express.Router();
+
+// ✅ Create Task (Only Doctors, Lab Techs, Pharmacists)
+router.post("/", authenticate, checkPermission("create_task"), createTask);
+
+// ✅ Get Tasks Assigned to or Created by the Logged-In User (Should be placed above get task id to prevent cast errors)
+router.get("/my", authenticate, getMyTasks); 
+
+// ✅ Get Task by ID (Requires "view_task" Permission)
+router.get("/:id", authenticate, checkPermission("view_task"), getTaskById);
+
+// ✅ Get All Tasks (Search, Pagination, Filtering) (Requires "view_task" Permission)
+router.get("/", authenticate, checkPermission("view_task"), getAllTasks); 
+
+// ✅ Update Task (Only Task Creator/Admin)
+router.put("/:id", authenticate, checkPermission("update_task"), updateTask);
+
+// ✅ Delete Task (Only Task Creator/Admin)
+router.delete("/:id", authenticate, checkPermission("delete_task"), deleteTask);
+
+// ✅ Complete Task (Only Assigned User)
+router.put("/:id/complete", authenticate, completeTask);
+
+module.exports = router;
+
+
+===== File: /services/medicalRecordService.js =====
+const MedicalRecord = require("../models/MedicalRecord");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+
+/**
+ * Generate AI-powered medical record summary with oversight and suggestions
+ */
+const generateMedicalSummary = async (patientId) => {
+  try {
+    // Fetch the last 10 medical records for the patient
+    const records = await MedicalRecord.find({ patient: patientId }).sort({ visitDate: -1 }).limit(10);
+    if (!records.length) return "No medical history available.";
+
+    // Extract key medical details
+    const medicalData = records.map((record) => ({
+      date: record.visitDate.toISOString().split("T")[0],
+      diagnosis: record.diagnosis,
+      treatment: record.treatment || "N/A",
+      symptoms: record.symptoms.length ? record.symptoms.join(", ") : "None",
+      medications: record.medications.length ? record.medications.join(", ") : "None",
+    }));
+    console.log("medical data for ai analysis::", medicalData)
+
+    // Construct prompt for AI analysis
+    const prompt = `
+    You are an advanced medical AI assisting doctors in analyzing patient history. Below is a summary of the last 10 medical records for a patient:
+    
+    ${JSON.stringify(medicalData, null, 2)}
+    
+    **TASK:**  
+    🔍 **1. Clinical Summary:** Provide a brief but medically accurate summary of the patient's history, including patterns and trends.  
+    
+    💡 **2. Treatment Optimization:** Assess the effectiveness of current treatments. Are there alternative medications, lifestyle changes, or new clinical guidelines that should be considered?  
+    
+    ⚠️ **3. Risk Analysis & Warnings:** Identify potential **medication interactions, overlooked symptoms, or signs of disease progression**. Highlight anything requiring **urgent attention**.  
+    
+    📊 **4. Predictive Insights:** Based on the patient's medical history, predict potential future health risks. Suggest preventive measures or screenings that could be beneficial.  
+    
+    🩺 **5. Actionable Doctor Recommendations:** Offer structured, **evidence-based recommendations** as if advising a specialist.  
+    - Should any medications be reconsidered or changed?  
+    - Does the diagnosis history indicate a possible **underlying condition** that was missed?  
+    - Are there lab tests, imaging, or specialist referrals that should be done?  
+    
+    **Provide your response in a structured, professional format suitable for clinical review.**  
+    `;
+    
+
+    // Send request to Google AI
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    return text.trim();
+  } catch (error) {
+    console.error("AI Summary Error:", error);
+    return "Error generating summary.";
+  }
+};
+
+module.exports = { generateMedicalSummary };
+
+
+===== File: /services/notificationService.js =====
+const EventEmitter = require("events");
+const Notification = require("../models/Notification");
+
+const notificationEmitter = new EventEmitter();
+
+/**
+ * Send a notification (WebSocket & Database)
+ * @param {string} userId - The recipient's user ID
+ * @param {string} message - Notification message
+ * @param {string} type - Type of notification ("appointment", "medical_record", "system", "reminder")
+ */
+const sendNotification = async (userId, message, type) => {
+  try {
+    // Determine priority based on type
+    let priority = "info";
+    if (type === "medical_record") priority = "urgent";
+    else if (type === "appointment") priority = "warning";
+    else if (type === "system") priority = "info";
+
+    // Create and save the notification
+    const notification = new Notification({ 
+      user: userId, 
+      message, 
+      type, 
+      priority 
+    });
+    await notification.save();
+
+    // Emit the new notification event
+    if (global.io) {
+      global.io.to(userId).emit("newNotification", { message, type, priority });
+
+      // Emit updated unread notification count
+      const unreadCount = await Notification.countDocuments({ user: userId, isRead: false });
+      global.io.to(userId).emit("notificationCount", { count: unreadCount });
+    }
+
+    // Emit event for other services (if needed)
+    notificationEmitter.emit("notificationSent", { userId, message, type, priority });
+
+  } catch (error) {
+    console.error("Notification Error:", error);
+  }
+};
+
+module.exports = { sendNotification, notificationEmitter };
+
+
+===== File: /services/shiftService.js =====
+const mongoose = require("mongoose");
+const Shift = require("../models/Shift");
+const User = require("../models/User");
+const Department = require("../models/Department");
+const notificationService = require("../services/notificationService");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+
+const shiftRules = {
+  morning: { start: "08:00 AM", end: "04:00 PM" },
+  evening: { start: "04:00 PM", end: "12:00 AM" },
+  night: { start: "12:00 AM", end: "08:00 AM" },
+};
+
+/**
+ * Helper function to extract clean JSON from AI response
+ */
+const extractJSON = (text) => {
+  try {
+    const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+    const cleanText = jsonMatch ? jsonMatch[1] : text;
+    return JSON.parse(cleanText);
+  } catch (error) {
+    console.error("❌ JSON Parsing Error:", error);
+    return null;
+  }
+};
+
+/**
+ * AI-Powered Shift Assignment using Gemini
+ */
+const autoAssignShifts = async () => {
+  try {
+    console.log("🔄 Running AI Shift Scheduler...");
+
+    const departments = await Department.find();
+    
+    for (const department of departments) {
+      const availableStaff = await User.find({ department: department._id, userType: "Staff", isActive: true });
+
+      if (availableStaff.length === 0) {
+        console.log(`⚠️ No available staff for department: ${department.name}`);
+        continue;
+      }
+
+      // Map available staff to valid ObjectIds
+      const staffMap = availableStaff.reduce((map, staff) => {
+        map[staff._id.toString()] = staff._id;
+        return map;
+      }, {});
+
+      const pastShifts = await Shift.find({ department: department._id }).sort({ date: -1 }).limit(30);
+      const shiftHistory = pastShifts.map(shift => ({
+        staffId: shift.staff.toString(),
+        date: shift.date,
+        type: shift.type,
+      }));
+
+      // AI Prompt
+      const prompt = `
+      You are an AI managing hospital shift scheduling.
+      Here is the recent shift history for the ${department.name} department:
+      ${JSON.stringify(shiftHistory, null, 2)}
+
+      **TASK:**
+      1️⃣ Assign shifts fairly, avoiding back-to-back night shifts.
+      2️⃣ Prioritize staff with fewer recent shifts.
+      3️⃣ Balance workload across all staff.
+      4️⃣ Use only these valid staff IDs: ${Object.keys(staffMap).join(", ")}
+      5️⃣ Output **pure JSON** format only.
+
+      Example JSON format:
+      [
+        {"staffId": "60d5f3b8e3a3a3b8a8b8b8b8", "date": "2025-03-18", "type": "morning"},
+        {"staffId": "60d5f3b8e3a3a3b8a8b8b8b9", "date": "2025-03-18", "type": "night"}
+      ]
+      `;
+
+      // Call Gemini AI for shift assignment
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const aiAssignments = extractJSON(response.text());
+      console.log("aiAssignments::", aiAssignments)
+
+      if (!aiAssignments) {
+        throw new Error("AI did not return valid JSON.");
+      }
+
+      for (const assignment of aiAssignments) {
+        const staffId = staffMap[assignment.staffId]; // Convert AI staffId to valid ObjectId
+        if (!staffId) {
+          console.warn(`⚠️ AI returned an invalid staff ID: ${assignment.staffId}`);
+          continue;
+        }
+
+        const existingShift = await Shift.findOne({ staff: staffId, date: assignment.date });
+        if (!existingShift) {
+          await Shift.create({
+            staff: staffId,
+            department: department._id,
+            date: assignment.date,
+            startTime: shiftRules[assignment.type].start,
+            endTime: shiftRules[assignment.type].end,
+            type: assignment.type,
+          });
+
+          console.log(`✅ AI assigned ${assignment.type} shift to staff ID ${staffId} (${department.name})`);
+           // **📢 Send notification to staff**
+           await notificationService.sendNotification(
+            assignment.staffId,  // User ID
+            `📢 You have been assigned a ${assignment.type} shift in ${department.name} on ${assignment.date}.`,
+            "shift"
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error("❌ AI Shift Scheduler Error:", error);
+  }
+};
+
+module.exports = { autoAssignShifts };
+
+
+===== File: /services/shiftService2.js =====
+const Shift = require("../models/Shift");
+const User = require("../models/User");
+const Department = require("../models/Department");
+const notificationService = require("../services/notificationService");
+
+// Shift configuration rules
+const shiftRules = {
+  morning: { start: "08:00 AM", end: "04:00 PM" },
+  evening: { start: "04:00 PM", end: "12:00 AM" },
+  night: { start: "12:00 AM", end: "08:00 AM" },
+};
+
+/**
+ * Auto-assign shifts based on available staff and department workload.
+ */
+const autoAssignShifts = async () => {
+  try {
+    console.log("🔄 Running AI Shift Scheduler...");
+
+    // Get all departments
+    const departments = await Department.find();
+    
+    for (const department of departments) {
+      // Get available staff in the department
+      const availableStaff = await User.find({ department: department._id, userType: "Staff", isActive: true });
+
+      if (availableStaff.length === 0) {
+        console.log(`⚠️ No available staff for department: ${department.name}`);
+        continue;
+      }
+
+      // Distribute staff across shifts
+      const shifts = Object.keys(shiftRules);
+      for (let i = 0; i < availableStaff.length; i++) {
+        const staff = availableStaff[i];
+        const shiftType = shifts[i % shifts.length]; // Rotate between morning, evening, and night
+
+        const existingShift = await Shift.findOne({ staff: staff._id, date: new Date().toISOString().split("T")[0] });
+        if (!existingShift) {
+          // Create new shift
+          const shift = await Shift.create({
+            staff: staff._id,
+            department: department._id,
+            date: new Date().toISOString().split("T")[0], // Today's date
+            startTime: shiftRules[shiftType].start,
+            endTime: shiftRules[shiftType].end,
+            type: shiftType,
+          });
+
+          console.log(`✅ Assigned ${shiftType} shift to ${staff.firstName} ${staff.lastName} (${department.name})`);
+          
+          await notificationService.sendNotification(
+            staff._id,  // Pass only the userId
+            `You have been assigned a ${shiftType} shift in ${department.name}.`,
+            "shift"
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error("❌ Error in AI Shift Scheduler:", error);
+  }
+};
+
+/**
+ * React dynamically to real-time staff availability changes.
+ */
+const handleStaffAvailabilityChange = async (staffId, isAvailable) => {
+  try {
+    console.log(`🔄 Updating shifts for staff: ${staffId}, Available: ${isAvailable}`);
+
+    if (!isAvailable) {
+      // Remove upcoming shifts for unavailable staff
+      await Shift.deleteMany({ staff: staffId, status: "scheduled" });
+      console.log(`🚫 Removed future shifts for unavailable staff: ${staffId}`);
+    } else {
+      // Re-run shift assignment for the department
+      await autoAssignShifts();
+    }
+  } catch (error) {
+    console.error("❌ Error handling staff availability change:", error);
+  }
+};
+
+module.exports = { autoAssignShifts, handleStaffAvailabilityChange };
+
+
+===== File: /services/socketService.js =====
+const logger = require("../utils/logger");
+
+/**
+ * Setup Socket.IO event listeners
+ * @param {Object} io - The Socket.IO instance
+ */
+const setupSocket = (io) => {
+  io.on("connection", (socket) => {
+    logger.info(`🔌 User connected: ${socket.id}`);
+
+    // Handle user joining a room (e.g., for private notifications)
+    socket.on("joinRoom", (userId) => {
+      socket.join(userId);
+      logger.info(`User ${userId} joined their notification room`);
+    });
+
+    // Handle disconnection
+    socket.on("disconnect", () => {
+      logger.info(`❌ User disconnected: ${socket.id}`);
+    });
+  });
+
+  // Store io globally so other services can use it
+  global.io = io;
+};
+
+module.exports = { setupSocket };
+
+
+===== File: /seeder.js =====
+require("dotenv").config();
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const connectDB = require("./config/db");
+const User = require("./models/User");
+const Staff = require("./models/Staff");
+const Permission = require("./models/Permission");
+const Role = require("./models/Role");
+const Department = require("./models/Department");
+const Patient = require("./models/Patient");
+const Appointment = require("./models/Appointment");
+const Notification = require("./models/Notification");
+const Task = require("./models/Task");
+const Shift = require("./models/Shift");
+const AuditLog = require("./models/AuditLog");
+const MedicalRecord = require("./models/MedicalRecord");
+const BlacklistedToken = require("./models/BlacklistedToken");
+
+// Define Super Admin Credentials
+const SUPER_ADMIN_EMAIL = "admin@hospital.com";
+const SUPER_ADMIN_PASSWORD = "Admin@123"; // Change this for production
+
+const seedDatabase = async () => {
+  try {
+    await connectDB();
+    console.log("🌱 Seeding database...");
+
+    // Clear existing data
+    await Permission.deleteMany({});
+    await Role.deleteMany({});
+    await Department.deleteMany({});
+    await Staff.deleteMany({});
+    await Patient.deleteMany({});
+    await Appointment.deleteMany({});
+    await Notification.deleteMany({});
+    await Task.deleteMany({});
+    await AuditLog.deleteMany({});
+    await Shift.deleteMany({});
+    await MedicalRecord.deleteMany({});
+    await BlacklistedToken.deleteMany({});
+    console.log("✅ Old data cleared");
+
+    // Insert new permissions
+    const permissionsData = [
+      // 🏥 Appointments Management
+      { action: "create_appointment", description: "Can create appointments" },
+      { action: "update_appointment", description: "Can update/confirm appointments" },
+      { action: "delete_appointment", description: "Can delete appointments" },
+      { action: "view_appointment", description: "Can view appointments" },
+    
+      // 👥 Staff Management
+      { action: "create_staff", description: "Can create staff accounts" },
+      { action: "update_staff", description: "Can update staff details" },
+      { action: "delete_staff", description: "Can delete staff accounts" },
+      { action: "view_staff", description: "Can view staff profiles" },
+    
+      // 🏥 Patient Management
+      { action: "create_patient", description: "Can register new patients" },
+      { action: "update_patient", description: "Can update patient information" },
+      { action: "delete_patient", description: "Can delete patient records" },
+      { action: "view_patient", description: "Can view patient details" },
+    
+      // 🕒 Shift Management
+      { action: "create_shift", description: "Can assign staff shifts" },
+      { action: "update_shift", description: "Can update staff shifts" },
+      { action: "delete_shift", description: "Can delete staff shifts" },
+      { action: "view_shift", description: "Can view staff shifts" },
+    
+      // 📋 Medical Records
+      { action: "create_medical_record", description: "Can create medical records" },
+      { action: "update_medical_record", description: "Can update medical records" },
+      { action: "delete_medical_record", description: "Can delete medical records" },
+      { action: "view_medical_record", description: "Can view medical records" },
+    
+      // 🔑 Admin Management
+      { action: "create_admin", description: "Can create admin accounts" },
+      { action: "update_admin", description: "Can update admin details" },
+      { action: "delete_admin", description: "Can delete admin accounts" },
+      { action: "view_admin", description: "Can view admin profiles" },
+    
+      // 🎭 Role Management
+      { action: "assign_role", description: "Can assign roles to staff" },
+      { action: "update_role", description: "Can update roles" },
+      { action: "delete_role", description: "Can delete roles" },
+      { action: "view_role", description: "Can view all roles and permissions" },
+    
+      // 🛡️ Permission Management
+      { action: "create_permission", description: "Can create new permissions" },
+      { action: "update_permission", description: "Can update existing permissions" },
+      { action: "delete_permission", description: "Can delete permissions" },
+      { action: "view_permission", description: "Can view all permissions" },
+    
+      // 📜 Audit Logs
+      { action: "view_audit_logs", description: "Can view system audit logs" },
+    
+      // 🏢 Department Management
+      { action: "create_department", description: "Can create departments" },
+      { action: "update_department", description: "Can update departments" },
+      { action: "delete_department", description: "Can delete departments" },
+      { action: "view_department", description: "Can view all departments" },
+    
+      // ✅ Task Management
+      { action: "create_task", description: "Can create new tasks" },
+      { action: "update_task", description: "Can update existing tasks" },
+      { action: "delete_task", description: "Can delete tasks" },
+      { action: "view_task", description: "Can view all tasks" },
+
+    ];
+    
+    
+    const createdPermissions = await Permission.insertMany(permissionsData);
+    console.log(`✅ Inserted ${createdPermissions.length} permissions`);
+
+    // Map actions to permission IDs
+    const permissionMap = {};
+    createdPermissions.forEach((perm) => {
+      permissionMap[perm.action] = perm._id;
+    });
+
+    // Insert roles
+    const rolesData = [
+      {
+        name: "Super Admin",
+        permissions: [
+          "view_audit_logs",
+          "create_permission", "update_permission", "delete_permission", "view_permission",
+          "create_admin", "update_admin", "delete_admin", "view_admin",
+          "assign_role", "update_role", "delete_role", "view_role",
+          "create_staff", "update_staff", "delete_staff", "view_staff",
+          "create_patient", "update_patient", "delete_patient", "view_patient",
+          "create_appointment", "update_appointment", "delete_appointment", "view_appointment",
+          "create_medical_record", "update_medical_record", "delete_medical_record", "view_medical_record",
+          "create_department", "update_department", "delete_department", "view_department",
+          "create_shift", "update_shift", "delete_shift", "view_shift", 
+          "create_task", "view_task", "update_task", "delete_task"
+        ]
+      },
+      {
+        name: "Admin",
+        permissions: [
+          "create_staff", "update_staff", "view_staff",
+          "create_patient", "update_patient", "view_patient",
+          "create_appointment", "update_appointment", "view_appointment",
+          "view_department",
+          "create_shift", "update_shift", "view_shift",
+          "create_task", "view_task", "update_task"
+        ]
+      },
+      {
+        name: "Doctor",
+        permissions: [
+          "create_appointment", "update_appointment", "view_appointment", "view_patient",
+          "create_medical_record", "update_medical_record", "view_medical_record",
+          "create_task", "view_task", "update_task", 
+        ]
+      },
+      {
+        name: "Nurse",
+        permissions: [
+          "update_medical_record", "view_medical_record",  
+          "view_patient"
+        ]
+      },
+      {
+        name: "Receptionist",
+        permissions: [
+          "create_appointment", "view_appointment", "update_appointment",
+          "create_patient", "view_patient", "update_patient", "view_staff", "view_department",
+           
+       
+        ]
+      },
+      {
+        name: "Patient",
+        permissions: [
+          "create_appointment", "view_appointment", "update_appointment",
+          "view_medical_record"
+       
+        ]
+      }  
+    
+    ];
+    
+    
+    
+    const rolesWithPermissions = rolesData.map((role) => ({
+      name: role.name,
+      permissions: role.permissions.map((action) => permissionMap[action])
+    }));
+    const createdRoles = await Role.insertMany(rolesWithPermissions);
+    console.log(`✅ Inserted ${createdRoles.length} staff roles`);
+
+    // Insert departments
+    const departmentsData = [
+      { name: "Admin", description: "Handles administrative tasks and hospital management" },
+      { name: "Cardiology", description: "Focuses on heart-related conditions and treatments" },
+      { name: "Neurology", description: "Deals with disorders of the nervous system" },
+      { name: "Radiology", description: "Responsible for imaging and diagnostic procedures" },
+      { name: "Pediatrics", description: "Specializes in medical care for children" },
+      { name: "Pathology/Laboratory", description: "Handles medical tests and diagnostics" }
+    
+    ];
+    const createdDepartments = await Department.insertMany(departmentsData);
+    console.log(`✅ Inserted ${createdDepartments.length} departments`);
+
+    // Find Admin Role and Department
+    const adminRole = createdRoles.find((role) => role.name === "Super Admin");
+    const adminDepartment = createdDepartments.find((dept) => dept.name === "Admin");
+
+    if (!adminRole || !adminDepartment) {
+      throw new Error("Super Admin role or department not found.");
+    }
+
+    // Check if Super Admin exists
+    const existingAdmin = await User.findOne({ email: SUPER_ADMIN_EMAIL });
+    if (!existingAdmin) {
+      // Create Super Admin User
+      const hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
+      const superAdmin = new Staff({
+        firstName: "Super",
+        lastName: "Admin",
+        email: SUPER_ADMIN_EMAIL,
+        password: hashedPassword,
+        phone: "123456789",
+        address: "Main Hospital Building",
+        gender: "Other",
+        userType: "Staff",
+        role: adminRole._id,
+        department: adminDepartment._id
+      });
+
+      await superAdmin.save();
+      console.log("✅ Super Admin user created successfully.");
+    } else {
+      console.log("⚠️ Super Admin user already exists. Skipping creation.");
+    }
+
+    console.log("🎉 Database seeding completed!");
+    process.exit();
+  } catch (error) {
+    console.error("❌ Seeding failed:", error);
+    process.exit(1);
+  }
+};
+
+// Run seeder
+seedDatabase();
+
+===== File: /server.js =====
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const http = require("http");
+const jwt = require("jsonwebtoken"); 
+const { Server } = require("socket.io");
+const connectDB = require("./config/db");
+const setupSocket = require("./services/socketService").setupSocket;
+const logger = require('./utils/logger');  
+const shiftService = require("./services/shiftService");
+
+// Import Routes
+const authRoutes = require("./routes/authRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
+const patientRoutes = require("./routes/patientRoutes");
+const staffRoutes = require("./routes/staffRoutes");
+const auditRoutes = require("./routes/auditRoutes");
+const medicalRecordRoutes = require("./routes/medicalRecordRoutes");
+const roleRoutes = require("./routes/roleRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
+const permissionRoutes = require("./routes/permissionRoutes")
+const shiftRoutes = require("./routes/shiftRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const socketMiddleware = require("./middlewares/socketMiddleware");
+
+// Initialize Express app
+const app = express();
+const server = http.createServer(app);
+
+const corsOptions = {
+  origin: [
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://[::1]:3000",
+    "https://didactic-couscous-g476qrwr9p5jhgp9-3000.app.github.dev"
+  ],
+  credentials: true,
+  preflightContinue: false,
+  optionSuccessStatus: 200
+};
+const io = new Server(server, {
+    cors: corsOptions, // Apply corsOptions to Socket.IO
+});
+
+// Connect to database
+connectDB();
+
+// Run AI shift scheduler on server startup
+setTimeout(() => shiftService.autoAssignShifts(), 5000);
+
+// Authentication middleware for Socket.IO
+io.use(socketMiddleware)
+ 
+// Setup WebSockets
+setupSocket(io);
+
+
+
+// Socket.IO Error Handling
+io.on("connect_error", (err) => {
+  logger.error(`Socket.IO connect_error: ${err.message}`);
+});
+
+io.on("connection", (socket) => {
+  logger.info(`🔌 User connected: ${socket.id}, UserID: ${socket.user?.id}`);
+
+   
+});
+
+// Middleware
+app.use(express.json());
+app.use(cors(corsOptions));
+
+// Attach io to request object
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/patients", patientRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/audit-logs", auditRoutes);
+app.use("/api/medical-records", medicalRecordRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/shifts", shiftRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+// Global Error Handler
+app.use(require('./middlewares/errorHandler'));
+
+app.get("/", (req, res) => {
+    res.json({
+      message: "Welcome to the Hospital Management System API!",
+      availableEndpoints: [
+        "/api/auth",
+        "/api/appointments",
+        "/api/patients",
+        "/api/staff",
+        "/api/audit-logs",
+        "/api/medical-records",
+        "/api/roles",
+        "/api/departments",
+      ],
+    });
+});
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+module.exports = { app, io };

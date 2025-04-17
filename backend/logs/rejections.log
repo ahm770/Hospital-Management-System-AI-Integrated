@@ -1,0 +1,34 @@
+2025-03-12 08:20:08.929 AM [Hospital-Management-System] error: unhandledRejection: consoe is not defined
+ReferenceError: consoe is not defined
+    at createStaff (/workspaces/Hospital-Management-System/backend/controllers/staffController.js:66:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) ReferenceError: consoe is not defined
+    at createStaff (/workspaces/Hospital-Management-System/backend/controllers/staffController.js:66:5)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-03-13 02:46:58.995 AM [Hospital-Management-System] error: unhandledRejection: Cannot set headers after they are sent to the client
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:655:11)
+    at ServerResponse.header (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:794:10)
+    at ServerResponse.send (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:174:12)
+    at ServerResponse.json (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:278:15)
+    at createPermission (/workspaces/Hospital-Management-System/backend/controllers/permissionController.js:21:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:655:11)
+    at ServerResponse.header (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:794:10)
+    at ServerResponse.send (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:174:12)
+    at ServerResponse.json (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:278:15)
+    at createPermission (/workspaces/Hospital-Management-System/backend/controllers/permissionController.js:21:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-03-13 02:53:07.209 AM [Hospital-Management-System] error: unhandledRejection: Cannot set headers after they are sent to the client
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:655:11)
+    at ServerResponse.header (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:794:10)
+    at ServerResponse.send (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:174:12)
+    at ServerResponse.json (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:278:15)
+    at createPermission (/workspaces/Hospital-Management-System/backend/controllers/permissionController.js:21:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:655:11)
+    at ServerResponse.header (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:794:10)
+    at ServerResponse.send (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:174:12)
+    at ServerResponse.json (/workspaces/Hospital-Management-System/backend/node_modules/express/lib/response.js:278:15)
+    at createPermission (/workspaces/Hospital-Management-System/backend/controllers/permissionController.js:21:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)

@@ -1,0 +1,1 @@
+export const BASE_URL = "https://didactic-couscous-g476qrwr9p5jhgp9-5000.app.github.dev"
